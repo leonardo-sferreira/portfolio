@@ -473,9 +473,16 @@ if (switcher) {
     });
     panels.forEach((p, i) => p.classList.toggle("active", i === index));
     switcher.setAttribute("data-active", key);
-    tabs[index].scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+    centerTabInList(tabs[index]);
 
     restartProgress();
+  }
+
+  function centerTabInList(tab) {
+    const list = tab.parentElement;
+    if (list.scrollWidth <= list.clientWidth) return;
+    const target = tab.offsetLeft - (list.clientWidth - tab.offsetWidth) / 2;
+    list.scrollTo({ left: Math.max(0, target), behavior: "smooth" });
   }
 
   function restartProgress() {
