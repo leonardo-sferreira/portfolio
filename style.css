@@ -351,6 +351,7 @@ h2 {
   gap: 14px;
   background: none;
   border: none;
+  outline: none;
   color: var(--text-muted);
   font-family: var(--font-body);
   text-align: left;
@@ -358,6 +359,10 @@ h2 {
   border-radius: 10px;
   cursor: pointer;
   transition: background 0.25s, color 0.25s;
+}
+.tab-item:focus-visible {
+  outline: 2px solid var(--accent-dyn);
+  outline-offset: -2px;
 }
 
 .tab-item:hover { background: rgba(255,255,255,0.04); color: var(--text); }
@@ -1001,8 +1006,15 @@ footer {
 /* ---------- RESPONSIVE ---------- */
 @media (max-width: 760px) {
   .servicos-switcher { grid-template-columns: 1fr; }
-  .tabs-list { flex-direction: row; overflow-x: auto; border-right: none; border-bottom: 1px solid rgba(255,255,255,0.07); }
-  .tab-item { flex-direction: column; gap: 4px; white-space: nowrap; }
+  .tabs-list {
+    flex-direction: row;
+    overflow-x: auto;
+    border-right: none;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    scroll-snap-type: x proximity;
+    scroll-padding: 0 20px;
+  }
+  .tab-item { flex-direction: column; gap: 4px; white-space: nowrap; scroll-snap-align: center; }
   .progress-track { display: none; }
   .tab-panel { flex-direction: column; text-align: center; padding: 28px; }
 }

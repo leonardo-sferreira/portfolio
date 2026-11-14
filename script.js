@@ -473,6 +473,7 @@ if (switcher) {
     });
     panels.forEach((p, i) => p.classList.toggle("active", i === index));
     switcher.setAttribute("data-active", key);
+    tabs[index].scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
 
     restartProgress();
   }
