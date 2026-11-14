@@ -1,12 +1,92 @@
 document.getElementById("ano").textContent = new Date().getFullYear();
 
-/* ---------- PRE-LOADER ---------- */
+/* ---------- PRE-LOADER: CONSTELAÇÃO ---------- */
 const preloader = document.getElementById("preloader");
+const preloaderCanvas = document.getElementById("preloaderCanvas");
+const loaderPct = document.getElementById("loaderPct");
 
-window.addEventListener("load", () => {
-  setTimeout(() => preloader.classList.add("hide"), 700);
-});
-setTimeout(() => preloader.classList.add("hide"), 4000);
+function dismissPreloader() {
+  preloader.classList.add("hide");
+  setTimeout(() => preloader.remove(), 700);
+}
+
+if (preloaderCanvas && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+  const pctx = preloaderCanvas.getContext("2d");
+  let pw = 0, ph = 0, pdpr = Math.min(window.devicePixelRatio || 1, 2);
+
+  function presize() {
+    pw = window.innerWidth;
+    ph = window.innerHeight;
+    preloaderCanvas.width = pw * pdpr;
+    preloaderCanvas.height = ph * pdpr;
+    preloaderCanvas.style.width = pw + "px";
+    preloaderCanvas.style.height = ph + "px";
+    pctx.setTransform(pdpr, 0, 0, pdpr, 0, 0);
+  }
+  presize();
+  window.addEventListener("resize", presize);
+
+  const pParticles = Array.from({ length: 90 }, () => ({
+    x: Math.random() * pw,
+    y: Math.random() * ph,
+    vx: (Math.random() - 0.5) * 0.4,
+    vy: (Math.random() - 0.5) * 0.4,
+    r: Math.random() * 1.4 + 0.6,
+    c: Math.random() < 0.5 ? "45,212,191" : "79,143,240",
+  }));
+
+  const PLINK = 150;
+  const startTime = performance.now();
+  const DURATION_MS = 1700;
+  let dismissed = false;
+
+  function drawPreloader() {
+    pctx.clearRect(0, 0, pw, ph);
+    for (const p of pParticles) {
+      p.x += p.vx;
+      p.y += p.vy;
+      if (p.x < 0 || p.x > pw) p.vx *= -1;
+      if (p.y < 0 || p.y > ph) p.vy *= -1;
+      pctx.beginPath();
+      pctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      pctx.fillStyle = `rgba(${p.c},0.85)`;
+      pctx.fill();
+    }
+    for (let i = 0; i < pParticles.length; i++) {
+      for (let j = i + 1; j < pParticles.length; j++) {
+        const a = pParticles[i], b = pParticles[j];
+        const d = Math.hypot(a.x - b.x, a.y - b.y);
+        if (d < PLINK) {
+          pctx.beginPath();
+          pctx.moveTo(a.x, a.y);
+          pctx.lineTo(b.x, b.y);
+          pctx.strokeStyle = `rgba(45,212,191,${0.16 * (1 - d / PLINK)})`;
+          pctx.lineWidth = 1;
+          pctx.stroke();
+        }
+      }
+    }
+
+    const elapsed = performance.now() - startTime;
+    const pct = Math.min(100, Math.round((elapsed / DURATION_MS) * 100));
+    loaderPct.textContent = pct + "%";
+
+    if (!dismissed) requestAnimationFrame(drawPreloader);
+  }
+  requestAnimationFrame(drawPreloader);
+
+  window.addEventListener("load", () => {
+    const remaining = Math.max(0, DURATION_MS - (performance.now() - startTime));
+    setTimeout(() => {
+      dismissed = true;
+      dismissPreloader();
+    }, remaining);
+  });
+} else {
+  window.addEventListener("load", () => setTimeout(dismissPreloader, 300));
+}
+
+setTimeout(dismissPreloader, 4500);
 
 /* ---------- SCROLL REVEAL ---------- */
 const revealEls = document.querySelectorAll(".reveal");

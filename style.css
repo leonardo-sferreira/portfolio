@@ -43,55 +43,34 @@ h1, h2, h3 { font-family: var(--font-head); }
   visibility: hidden;
 }
 
-.loader-content {
-  position: relative;
-  width: 110px;
-  height: 110px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.loader-ring {
+#preloaderCanvas {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-  transform: rotate(-90deg);
 }
 
-.loader-ring-bg {
-  fill: none;
-  stroke: rgba(255,255,255,0.08);
-  stroke-width: 4;
+.loader-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
 }
 
-.loader-ring-fill {
-  fill: none;
-  stroke: var(--accent-light);
-  stroke-width: 4;
-  stroke-linecap: round;
-  stroke-dasharray: 264;
-  stroke-dashoffset: 264;
-  animation: ring 1.4s cubic-bezier(.65,0,.35,1) forwards;
-}
-
-.loader-text {
+.loader-pct {
   font-family: var(--font-head);
-  font-size: 1.3rem;
+  font-size: 2.2rem;
   font-weight: 700;
-  letter-spacing: 2px;
   color: var(--text);
-  animation: pulse 1.2s ease-in-out infinite;
 }
 
-@keyframes ring {
-  to { stroke-dashoffset: 40; }
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 0.55; }
-  50% { opacity: 1; }
+.loader-label {
+  font-size: 0.78rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-muted);
 }
 
 /* ---------- SCROLL REVEAL ---------- */

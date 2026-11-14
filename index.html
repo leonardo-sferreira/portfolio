@@ -13,12 +13,10 @@
 
   <!-- PRE-LOADER -->
   <div id="preloader">
+    <canvas id="preloaderCanvas"></canvas>
     <div class="loader-content">
-      <svg class="loader-ring" viewBox="0 0 100 100">
-        <circle class="loader-ring-bg" cx="50" cy="50" r="42"></circle>
-        <circle class="loader-ring-fill" cx="50" cy="50" r="42"></circle>
-      </svg>
-      <span class="loader-text">LF</span>
+      <span class="loader-pct" id="loaderPct">0%</span>
+      <span class="loader-label">Carregando</span>
     </div>
   </div>
 
