@@ -1,5 +1,79 @@
 document.getElementById("ano").textContent = new Date().getFullYear();
 
+/* ---------- BARRA DE PROGRESSO ---------- */
+const scrollProgress = document.getElementById("scrollProgress");
+if (scrollProgress) {
+  const updateProgress = () => {
+    const h = document.documentElement;
+    const scrolled = h.scrollTop;
+    const total = h.scrollHeight - h.clientHeight;
+    scrollProgress.style.width = (total > 0 ? (scrolled / total) * 100 : 0) + "%";
+  };
+  window.addEventListener("scroll", updateProgress, { passive: true });
+  window.addEventListener("resize", updateProgress);
+  updateProgress();
+}
+
+/* ---------- GLITCH NO HOVER (menu e logo) ---------- */
+const GLITCH_CHARS = "!<>-_\\/[]{}—=+*^?#01";
+function attachGlitch(el) {
+  const original = el.textContent;
+  let frame = null;
+  el.addEventListener("mouseenter", () => {
+    if (frame) cancelAnimationFrame(frame);
+    let iteration = 0;
+    const totalSteps = 10;
+    function step() {
+      el.textContent = original
+        .split("")
+        .map((ch, i) => {
+          if (ch === " ") return " ";
+          const revealAt = (i / original.length) * totalSteps;
+          if (iteration >= revealAt) return original[i];
+          return GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)];
+        })
+        .join("");
+      iteration += 1;
+      if (iteration <= totalSteps) {
+        frame = requestAnimationFrame(() => setTimeout(step, 28));
+      } else {
+        el.textContent = original;
+      }
+    }
+    step();
+  });
+}
+document.querySelectorAll(".navbar nav a, .logo").forEach(attachGlitch);
+
+/* ---------- ÍCONES: DESENHO (SVG DRAW-IN) ---------- */
+function prepareDraw(svg) {
+  const shapes = svg.querySelectorAll("path, line, polyline, circle, ellipse, rect");
+  shapes.forEach((shape) => {
+    if (typeof shape.getTotalLength !== "function") return;
+    let len;
+    try {
+      len = shape.getTotalLength();
+    } catch (e) {
+      return;
+    }
+    shape.style.strokeDasharray = `${len}`;
+    shape.style.strokeDashoffset = `${len}`;
+    shape.style.transition = "stroke-dashoffset 0.9s ease";
+  });
+}
+function playDraw(svg) {
+  svg.querySelectorAll("path, line, polyline, circle, ellipse, rect").forEach((shape) => {
+    shape.style.strokeDashoffset = "0";
+  });
+}
+function resetDraw(svg) {
+  svg.querySelectorAll("path, line, polyline, circle, ellipse, rect").forEach((shape) => {
+    const len = shape.style.strokeDasharray;
+    if (len) shape.style.strokeDashoffset = len;
+  });
+}
+document.querySelectorAll(".stage-icon, .diagram-icon, .diagram-arrow").forEach(prepareDraw);
+
 /* ---------- LINKEDIN: placeholder ainda não preenchido ---------- */
 const linkedinLink = document.getElementById("linkedinLink");
 if (linkedinLink) {
@@ -168,6 +242,7 @@ if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
           entry.target.querySelector(".device-viewport")?.classList.add("wipe-done");
+          entry.target.querySelectorAll(".diagram-icon, .diagram-arrow").forEach(playDraw);
           wipeObserver.unobserve(entry.target);
         }
       });
@@ -550,6 +625,32 @@ if (modalOverlay) {
     galIndex = (galIndex + 1) % galImages.length;
     renderGallery();
   });
+
+  /* arrastar/deslizar a galeria */
+  let dragStartX = null;
+  modalGallery.addEventListener("pointerdown", (e) => {
+    if (galImages.length < 2) return;
+    dragStartX = e.clientX;
+    modalGallery.setPointerCapture(e.pointerId);
+    modalGallery.classList.add("dragging");
+  });
+  modalGallery.addEventListener("pointerup", (e) => {
+    if (dragStartX === null) return;
+    const delta = e.clientX - dragStartX;
+    if (delta > 40) {
+      galIndex = (galIndex - 1 + galImages.length) % galImages.length;
+      renderGallery();
+    } else if (delta < -40) {
+      galIndex = (galIndex + 1) % galImages.length;
+      renderGallery();
+    }
+    dragStartX = null;
+    modalGallery.classList.remove("dragging");
+  });
+  modalGallery.addEventListener("pointercancel", () => {
+    dragStartX = null;
+    modalGallery.classList.remove("dragging");
+  });
 }
 
 /* ---------- SERVIÇOS: SCROLL PINADO ---------- */
@@ -577,7 +678,12 @@ if (scrolly) {
     ringFill.style.strokeDashoffset = String(RING_CIRC * (1 - progress));
 
     copies.forEach((c) => c.classList.toggle("active", Number(c.dataset.stage) === stage));
-    icons.forEach((i) => i.classList.toggle("active", Number(i.dataset.stage) === stage));
+    icons.forEach((i) => {
+      const isActive = Number(i.dataset.stage) === stage;
+      i.classList.toggle("active", isActive);
+      if (isActive) playDraw(i);
+      else resetDraw(i);
+    });
     dots.forEach((d) => d.classList.toggle("active", Number(d.dataset.stage) === stage));
   }
 
