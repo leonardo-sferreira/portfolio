@@ -1013,14 +1013,21 @@ footer {
 @media (max-width: 760px) {
   .servicos-switcher { grid-template-columns: 1fr; }
   .tabs-list {
-    flex-direction: row;
-    overflow-x: auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
     border-right: none;
     border-bottom: 1px solid rgba(255,255,255,0.07);
-    scroll-snap-type: x proximity;
-    scroll-padding: 0 20px;
   }
-  .tab-item { flex-direction: column; gap: 4px; white-space: nowrap; scroll-snap-align: center; }
+  .tab-item {
+    flex-direction: column;
+    gap: 4px;
+    white-space: normal;
+    text-align: center;
+    align-items: center;
+    border: 1px solid rgba(255,255,255,0.07);
+  }
+  .tab-item.active { border-color: var(--accent-dyn); }
   .progress-track { display: none; }
   .tab-panel { flex-direction: column; text-align: center; padding: 28px; }
 }
