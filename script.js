@@ -1,5 +1,13 @@
 document.getElementById("ano").textContent = new Date().getFullYear();
 
+/* ---------- LINKEDIN: placeholder ainda não preenchido ---------- */
+const linkedinLink = document.getElementById("linkedinLink");
+if (linkedinLink) {
+  linkedinLink.addEventListener("click", (e) => {
+    if (linkedinLink.getAttribute("href") === "#") e.preventDefault();
+  });
+}
+
 /* ---------- PRE-LOADER: CONSTELAÇÃO ---------- */
 const preloader = document.getElementById("preloader");
 const preloaderCanvas = document.getElementById("preloaderCanvas");
@@ -334,6 +342,8 @@ const modalLink = document.getElementById("modalLink");
 if (modalOverlay) {
   let galImages = [];
   let galIndex = 0;
+  let lastFocused = null;
+  const modalEl = document.querySelector(".modal");
 
   function renderGallery() {
     if (!galImages.length) {
@@ -381,12 +391,37 @@ if (modalOverlay) {
     modalBody.classList.remove("anim-in");
     void modalBody.offsetWidth;
     modalBody.classList.add("anim-in");
+
+    lastFocused = document.activeElement;
+    requestAnimationFrame(() => document.getElementById("modalClose").focus());
   }
 
   function closeModal() {
     modalOverlay.classList.remove("open");
     document.body.style.overflow = "";
+    if (lastFocused) lastFocused.focus();
   }
+
+  function getFocusable() {
+    return Array.from(
+      modalEl.querySelectorAll('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])')
+    ).filter((el) => el.offsetParent !== null);
+  }
+
+  modalEl.addEventListener("keydown", (e) => {
+    if (e.key !== "Tab") return;
+    const focusable = getFocusable();
+    if (!focusable.length) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  });
 
   document.querySelectorAll(".btn-case").forEach((btn) => {
     btn.addEventListener("click", () => openModal(btn.dataset.project));
@@ -405,7 +440,7 @@ if (modalOverlay) {
     if (e.target === modalOverlay) closeModal();
   });
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") closeModal();
+    if (e.key === "Escape" && modalOverlay.classList.contains("open")) closeModal();
   });
   document.getElementById("galPrev").addEventListener("click", () => {
     galIndex = (galIndex - 1 + galImages.length) % galImages.length;

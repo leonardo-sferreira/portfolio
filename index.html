@@ -4,6 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Leonardo Ferreira | Portfólio</title>
+<meta name="description" content="Leonardo Ferreira — desenvolvedor de software. Projetos reais de web, mobile, automação e banco de dados.">
+<meta property="og:title" content="Leonardo Ferreira | Portfólio">
+<meta property="og:description" content="Desenvolvedor de software — projetos reais de web, mobile, automação e banco de dados.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230b0d10'/%3E%3Ctext x='50' y='68' font-size='58' font-family='Georgia,serif' font-weight='bold' fill='%232dd4bf' text-anchor='middle'%3EL%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -86,22 +91,22 @@
 
       <div class="tabs-list" role="tablist">
 
-        <button class="tab-item active" data-tab="web" role="tab" aria-selected="true">
+        <button class="tab-item active" data-tab="web" role="tab" aria-selected="true" aria-controls="panel-web" id="tab-web">
           <span class="tab-index">01</span>
           <span class="tab-name">Desenvolvimento Web</span>
         </button>
 
-        <button class="tab-item" data-tab="mobile" role="tab" aria-selected="false">
+        <button class="tab-item" data-tab="mobile" role="tab" aria-selected="false" aria-controls="panel-mobile" id="tab-mobile">
           <span class="tab-index">02</span>
           <span class="tab-name">Mobile</span>
         </button>
 
-        <button class="tab-item" data-tab="automacao" role="tab" aria-selected="false">
+        <button class="tab-item" data-tab="automacao" role="tab" aria-selected="false" aria-controls="panel-automacao" id="tab-automacao">
           <span class="tab-index">03</span>
           <span class="tab-name">Automações</span>
         </button>
 
-        <button class="tab-item" data-tab="dados" role="tab" aria-selected="false">
+        <button class="tab-item" data-tab="dados" role="tab" aria-selected="false" aria-controls="panel-dados" id="tab-dados">
           <span class="tab-index">04</span>
           <span class="tab-name">Banco de Dados</span>
         </button>
@@ -113,7 +118,7 @@
 
       <div class="tabs-panels">
 
-        <div class="tab-panel active" data-panel="web">
+        <div class="tab-panel active" data-panel="web" role="tabpanel" id="panel-web" aria-labelledby="tab-web">
           <svg class="panel-icon" viewBox="0 0 120 120" fill="none">
             <rect x="14" y="22" width="92" height="64" rx="8" stroke="currentColor" stroke-width="3"/>
             <path d="M14 38h92" stroke="currentColor" stroke-width="3"/>
@@ -131,7 +136,7 @@
           </div>
         </div>
 
-        <div class="tab-panel" data-panel="mobile">
+        <div class="tab-panel" data-panel="mobile" role="tabpanel" id="panel-mobile" aria-labelledby="tab-mobile">
           <svg class="panel-icon" viewBox="0 0 120 120" fill="none">
             <rect x="36" y="14" width="48" height="92" rx="9" stroke="currentColor" stroke-width="3"/>
             <path d="M36 90h48" stroke="currentColor" stroke-width="3"/>
@@ -147,7 +152,7 @@
           </div>
         </div>
 
-        <div class="tab-panel" data-panel="automacao">
+        <div class="tab-panel" data-panel="automacao" role="tabpanel" id="panel-automacao" aria-labelledby="tab-automacao">
           <svg class="panel-icon" viewBox="0 0 120 120" fill="none">
             <circle cx="42" cy="42" r="14" stroke="currentColor" stroke-width="3"/>
             <circle cx="80" cy="78" r="14" stroke="currentColor" stroke-width="3"/>
@@ -164,7 +169,7 @@
           </div>
         </div>
 
-        <div class="tab-panel" data-panel="dados">
+        <div class="tab-panel" data-panel="dados" role="tabpanel" id="panel-dados" aria-labelledby="tab-dados">
           <svg class="panel-icon" viewBox="0 0 120 120" fill="none">
             <ellipse cx="60" cy="30" rx="34" ry="12" stroke="currentColor" stroke-width="3"/>
             <path d="M26 30v24c0 6.6 15.2 12 34 12s34-5.4 34-12V30" stroke="currentColor" stroke-width="3"/>
