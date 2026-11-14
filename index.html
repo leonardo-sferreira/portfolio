@@ -4,15 +4,24 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Leonardo Ferreira | Portfólio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+  <!-- CURSOR -->
+  <div class="cursor-dot" id="cursorDot"></div>
+
   <!-- PRE-LOADER -->
   <div id="preloader">
     <div class="loader-content">
+      <svg class="loader-ring" viewBox="0 0 100 100">
+        <circle class="loader-ring-bg" cx="50" cy="50" r="42"></circle>
+        <circle class="loader-ring-fill" cx="50" cy="50" r="42"></circle>
+      </svg>
       <span class="loader-text">LF</span>
-      <div class="loader-bar"><div class="loader-fill"></div></div>
     </div>
   </div>
 
@@ -30,17 +39,21 @@
   <!-- HERO -->
   <section class="hero" id="topo">
     <div class="hero-content">
-      <p class="hero-sub">Olá, eu sou</p>
-      <h1>Leonardo Ferreira</h1>
-      <p class="hero-role">Desenvolvedor de Software</p>
-      <a href="#contato" class="btn-primary">Fale comigo</a>
+      <p class="hero-sub reveal">Olá, eu sou</p>
+      <h1 class="reveal" style="--delay:0.08s">Leonardo Ferreira</h1>
+      <p class="hero-role reveal" style="--delay:0.16s">Desenvolvedor de Software</p>
+      <a href="#contato" class="btn-primary reveal" style="--delay:0.24s">Fale comigo</a>
+    </div>
+    <div class="hero-scroll">
+      <span></span>
     </div>
   </section>
 
   <!-- SOBRE -->
   <section class="sobre" id="sobre">
-    <h2>Sobre mim</h2>
-    <p>
+    <span class="section-tag reveal">Quem sou eu</span>
+    <h2 class="reveal">Sobre mim</h2>
+    <p class="reveal" style="--delay:0.1s">
       Sou desenvolvedor com foco em criar soluções práticas e bem construídas,
       do front-end ao back-end. Gosto de resolver problemas reais e entregar
       projetos que funcionam de verdade.
@@ -49,72 +62,142 @@
 
   <!-- SERVIÇOS -->
   <section class="servicos" id="servicos">
-    <h2>Serviços</h2>
-    <div class="servicos-grid">
+    <span class="section-tag reveal">O que eu faço</span>
+    <h2 class="reveal">Serviços</h2>
 
-      <div class="card">
-        <div class="card-icon">💻</div>
-        <h3>Desenvolvimento Web</h3>
-        <p>Sites institucionais, landing pages e sistemas web sob medida.</p>
+    <div class="servicos-switcher reveal" data-active="web" style="--delay:0.1s">
+
+      <div class="tabs-list" role="tablist">
+
+        <button class="tab-item active" data-tab="web" role="tab" aria-selected="true">
+          <span class="tab-index">01</span>
+          <span class="tab-name">Desenvolvimento Web</span>
+        </button>
+
+        <button class="tab-item" data-tab="mobile" role="tab" aria-selected="false">
+          <span class="tab-index">02</span>
+          <span class="tab-name">Mobile</span>
+        </button>
+
+        <button class="tab-item" data-tab="automacao" role="tab" aria-selected="false">
+          <span class="tab-index">03</span>
+          <span class="tab-name">Automações</span>
+        </button>
+
+        <button class="tab-item" data-tab="dados" role="tab" aria-selected="false">
+          <span class="tab-index">04</span>
+          <span class="tab-name">Banco de Dados</span>
+        </button>
+
+        <div class="progress-track">
+          <div class="progress-fill" id="servicosProgress"></div>
+        </div>
       </div>
 
-      <div class="card">
-        <div class="card-icon">⚙️</div>
-        <h3>Automação</h3>
-        <p>Scripts e ferramentas para automatizar tarefas repetitivas.</p>
-      </div>
+      <div class="tabs-panels">
 
-      <div class="card">
-        <div class="card-icon">🔧</div>
-        <h3>Manutenção de Sistemas</h3>
-        <p>Correção de bugs, melhorias e atualização de código existente.</p>
-      </div>
+        <div class="tab-panel active" data-panel="web">
+          <svg class="panel-icon" viewBox="0 0 120 120" fill="none">
+            <rect x="14" y="22" width="92" height="64" rx="8" stroke="currentColor" stroke-width="3"/>
+            <path d="M14 38h92" stroke="currentColor" stroke-width="3"/>
+            <circle cx="24" cy="30" r="2.5" fill="currentColor"/>
+            <circle cx="33" cy="30" r="2.5" fill="currentColor"/>
+            <circle cx="42" cy="30" r="2.5" fill="currentColor"/>
+            <path d="M44 56l-12 10 12 10M76 56l12 10-12 10M64 52l-8 28" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <div class="panel-text">
+            <h3>Desenvolvimento Web</h3>
+            <p>Sites, landing pages e sistemas web sob medida, do zero ou evoluindo o que já existe — com atenção a performance e código que se sustenta no tempo.</p>
+            <ul class="tag-list">
+              <li>React</li><li>Node.js</li><li>APIs</li><li>SSR</li>
+            </ul>
+          </div>
+        </div>
 
-      <div class="card">
-        <div class="card-icon">📱</div>
-        <h3>Aplicações Mobile</h3>
-        <p>Apps simples e funcionais para Android/iOS.</p>
-      </div>
+        <div class="tab-panel" data-panel="mobile">
+          <svg class="panel-icon" viewBox="0 0 120 120" fill="none">
+            <rect x="36" y="14" width="48" height="92" rx="9" stroke="currentColor" stroke-width="3"/>
+            <path d="M36 90h48" stroke="currentColor" stroke-width="3"/>
+            <circle cx="60" cy="98" r="3" fill="currentColor"/>
+            <path d="M50 46l-8 14 8 14M70 46l8 14-8 14M64 42l-8 36" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <div class="panel-text">
+            <h3>Mobile</h3>
+            <p>Aplicativos simples e funcionais para Android e iOS, pensados para resolver um problema de verdade — sem inchar o app com telas que ninguém usa.</p>
+            <ul class="tag-list">
+              <li>React Native</li><li>Android</li><li>iOS</li><li>APIs</li>
+            </ul>
+          </div>
+        </div>
 
-      <div class="card">
-        <div class="card-icon">🗄️</div>
-        <h3>Banco de Dados</h3>
-        <p>Modelagem, consultas e integração de bancos de dados.</p>
-      </div>
+        <div class="tab-panel" data-panel="automacao">
+          <svg class="panel-icon" viewBox="0 0 120 120" fill="none">
+            <circle cx="42" cy="42" r="14" stroke="currentColor" stroke-width="3"/>
+            <circle cx="80" cy="78" r="14" stroke="currentColor" stroke-width="3"/>
+            <path d="M42 56v10a8 8 0 0 0 8 8h18M68 78h2" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+            <path d="M56 70l6 4-6 4" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M58 36h24M70 24v24" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-dasharray="1 7"/>
+          </svg>
+          <div class="panel-text">
+            <h3>Automações</h3>
+            <p>Scripts e integrações que tiram tarefa repetitiva do seu caminho — planilhas, rotinas de dados, processos manuais que viram um botão ou um cron job.</p>
+            <ul class="tag-list">
+              <li>Python</li><li>Scripts</li><li>Integrações</li><li>Cron Jobs</li>
+            </ul>
+          </div>
+        </div>
 
-      <div class="card">
-        <div class="card-icon">🚀</div>
-        <h3>Deploy &amp; Hospedagem</h3>
-        <p>Publicação e configuração do seu projeto para ir ao ar.</p>
-      </div>
+        <div class="tab-panel" data-panel="dados">
+          <svg class="panel-icon" viewBox="0 0 120 120" fill="none">
+            <ellipse cx="60" cy="30" rx="34" ry="12" stroke="currentColor" stroke-width="3"/>
+            <path d="M26 30v24c0 6.6 15.2 12 34 12s34-5.4 34-12V30" stroke="currentColor" stroke-width="3"/>
+            <path d="M26 54v24c0 6.6 15.2 12 34 12s34-5.4 34-12V54" stroke="currentColor" stroke-width="3"/>
+          </svg>
+          <div class="panel-text">
+            <h3>Banco de Dados</h3>
+            <p>Modelagem, consultas e integração de bancos de dados — estrutura pensada para aguentar o crescimento do produto sem virar gargalo.</p>
+            <ul class="tag-list">
+              <li>PostgreSQL</li><li>MySQL</li><li>Modelagem</li><li>SQL</li>
+            </ul>
+          </div>
+        </div>
 
+      </div>
     </div>
   </section>
 
   <!-- PROJETOS -->
   <section class="projetos" id="projetos">
-    <h2>Projetos</h2>
+    <span class="section-tag reveal">Trabalhos</span>
+    <h2 class="reveal">Projetos</h2>
     <div class="projetos-grid">
-      <div class="projeto-card">
+      <a href="#" class="projeto-card reveal" style="--delay:0.05s">
+        <span class="projeto-num">01</span>
         <h3>Projeto Exemplo 1</h3>
         <p>Descrição breve do projeto. Substitua pelos seus trabalhos reais.</p>
-      </div>
-      <div class="projeto-card">
+        <span class="projeto-link">Ver projeto →</span>
+      </a>
+      <a href="#" class="projeto-card reveal" style="--delay:0.12s">
+        <span class="projeto-num">02</span>
         <h3>Projeto Exemplo 2</h3>
         <p>Descrição breve do projeto. Substitua pelos seus trabalhos reais.</p>
-      </div>
-      <div class="projeto-card">
+        <span class="projeto-link">Ver projeto →</span>
+      </a>
+      <a href="#" class="projeto-card reveal" style="--delay:0.19s">
+        <span class="projeto-num">03</span>
         <h3>Projeto Exemplo 3</h3>
         <p>Descrição breve do projeto. Substitua pelos seus trabalhos reais.</p>
-      </div>
+        <span class="projeto-link">Ver projeto →</span>
+      </a>
     </div>
   </section>
 
   <!-- CONTATO -->
   <section class="contato" id="contato">
-    <h2>Contato</h2>
-    <p>Quer conversar sobre um projeto? Me envie uma mensagem.</p>
-    <a href="mailto:seuemail@exemplo.com" class="btn-primary">Enviar e-mail</a>
+    <span class="section-tag reveal">Vamos conversar</span>
+    <h2 class="reveal">Contato</h2>
+    <p class="reveal" style="--delay:0.08s">Quer conversar sobre um projeto? Me envie uma mensagem.</p>
+    <a href="mailto:seuemail@exemplo.com" class="btn-primary reveal" style="--delay:0.16s">Enviar e-mail</a>
   </section>
 
   <footer>
