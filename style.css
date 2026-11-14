@@ -197,6 +197,9 @@ h2 {
   font-size: clamp(2.6rem, 6.5vw, 4.4rem);
   font-weight: 700;
   margin-bottom: 10px;
+}
+
+.hero h1 .word-inner {
   background: linear-gradient(120deg, var(--text) 30%, var(--accent-light) 50%, var(--text) 70%);
   background-size: 220% auto;
   -webkit-background-clip: text;
@@ -464,6 +467,55 @@ h2 {
   font-size: 0.85rem;
 }
 
+/* ---------- MARQUEE DE TECNOLOGIAS ---------- */
+.tech-marquee {
+  overflow: hidden;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  padding: 22px 0;
+  background: var(--bg-alt);
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  gap: 48px;
+  animation: marquee 26s linear infinite;
+}
+
+.tech-marquee:hover .marquee-track { animation-play-state: paused; }
+
+.marquee-track span {
+  font-family: var(--font-head);
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  letter-spacing: 0.3px;
+}
+
+@keyframes marquee {
+  to { transform: translateX(-50%); }
+}
+
+/* ---------- TEXTO: REVELO POR PALAVRA ---------- */
+.split-text .word {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+}
+.split-text .word-inner {
+  display: inline-block;
+  transform: translateY(110%);
+  opacity: 0;
+  transition: transform 0.6s cubic-bezier(.22,.9,.3,1), opacity 0.4s ease;
+  transition-delay: var(--wi, 0s);
+}
+.split-text.in-view .word-inner {
+  transform: translateY(0);
+  opacity: 1;
+}
+
 /* ---------- TRAJETÓRIA (projetos) ---------- */
 .trajetoria-intro {
   max-width: 560px;
@@ -580,6 +632,7 @@ h2 {
   grid-template-columns: 260px 1fr;
   gap: 28px;
   align-items: start;
+  perspective: 800px;
 }
 
 .traj-media {
@@ -590,6 +643,8 @@ h2 {
   background: var(--bg-alt);
   cursor: pointer;
   transition: border-color 0.3s, transform 0.3s;
+  transform-style: preserve-3d;
+  will-change: transform;
 }
 .traj-media:hover { border-color: var(--card-accent); }
 .traj-media:active { transform: scale(0.98); }
@@ -637,7 +692,10 @@ h2 {
   aspect-ratio: 16 / 11;
   overflow: hidden;
   background: #000;
+  transition: clip-path 0.9s cubic-bezier(.2,.7,.2,1);
 }
+.device-viewport.wipe-ready { clip-path: inset(0 100% 0 0); }
+.device-viewport.wipe-done { clip-path: inset(0 0 0 0); }
 
 .device-viewport img {
   display: block;

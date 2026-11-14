@@ -111,6 +111,106 @@ const revealObserver = new IntersectionObserver(
 );
 revealEls.forEach((el) => revealObserver.observe(el));
 
+/* ---------- TEXTO: REVELO POR PALAVRA ---------- */
+const splitEls = document.querySelectorAll(".split-text");
+splitEls.forEach((el) => {
+  const words = el.textContent.trim().split(/\s+/);
+  el.innerHTML = words
+    .map((w, i) => `<span class="word"><span class="word-inner" style="--wi:${i * 0.05}s">${w}</span></span>`)
+    .join(" ");
+});
+
+const splitObserver = new IntersectionObserver(
+  (entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add("in-view");
+        splitObserver.unobserve(entry.target);
+      }
+    });
+  },
+  { threshold: 0.4 }
+);
+splitEls.forEach((el) => splitObserver.observe(el));
+
+/* ---------- NÚMEROS: CONTADOR ---------- */
+const counterEls = document.querySelectorAll(".stat-number[data-count]");
+const counterObserver = new IntersectionObserver(
+  (entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        const el = entry.target;
+        const target = Number(el.dataset.count);
+        const suffix = el.dataset.suffix || "";
+        const duration = 1200;
+        const start = performance.now();
+        function tick(now) {
+          const p = Math.min(1, (now - start) / duration);
+          const eased = 1 - Math.pow(1 - p, 3);
+          el.textContent = Math.round(eased * target) + suffix;
+          if (p < 1) requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+        counterObserver.unobserve(el);
+      }
+    });
+  },
+  { threshold: 0.5 }
+);
+counterEls.forEach((el) => counterObserver.observe(el));
+
+/* ---------- IMAGENS DOS PROJETOS: WIPE AO ENTRAR NA TELA ---------- */
+const wipeCards = document.querySelectorAll(".traj-media");
+if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+  wipeCards.forEach((card) => card.querySelector(".device-viewport")?.classList.add("wipe-ready"));
+  const wipeObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.querySelector(".device-viewport")?.classList.add("wipe-done");
+          wipeObserver.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.3 }
+  );
+  wipeCards.forEach((card) => wipeObserver.observe(card));
+}
+
+/* ---------- IMAGENS DOS PROJETOS: TILT 3D ---------- */
+if (window.matchMedia("(pointer: fine)").matches) {
+  document.querySelectorAll(".traj-media").forEach((media) => {
+    media.addEventListener("mousemove", (e) => {
+      const rect = media.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width - 0.5;
+      const y = (e.clientY - rect.top) / rect.height - 0.5;
+      media.style.transition = "transform 0.1s ease-out";
+      media.style.transform = `perspective(800px) rotateX(${(-y * 10).toFixed(2)}deg) rotateY(${(x * 10).toFixed(2)}deg)`;
+    });
+    media.addEventListener("mouseleave", () => {
+      media.style.transition = "transform 0.5s ease";
+      media.style.transform = "";
+    });
+  });
+}
+
+/* ---------- BOTÕES MAGNÉTICOS ---------- */
+if (window.matchMedia("(pointer: fine)").matches) {
+  document.querySelectorAll(".btn-primary, .btn-secondary").forEach((btn) => {
+    btn.addEventListener("mousemove", (e) => {
+      const rect = btn.getBoundingClientRect();
+      const x = e.clientX - rect.left - rect.width / 2;
+      const y = e.clientY - rect.top - rect.height / 2;
+      btn.style.transition = "transform 0.15s ease-out";
+      btn.style.transform = `translate(${(x * 0.3).toFixed(1)}px, ${(y * 0.35).toFixed(1)}px)`;
+    });
+    btn.addEventListener("mouseleave", () => {
+      btn.style.transition = "transform 0.4s cubic-bezier(.22,1.4,.4,1)";
+      btn.style.transform = "";
+    });
+  });
+}
+
 /* ---------- HERO: PAPEL GIRATÓRIO ---------- */
 const roleTextEl = document.getElementById("roleText");
 
