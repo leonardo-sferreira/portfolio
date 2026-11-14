@@ -192,6 +192,15 @@
     <div class="trajetoria-layout">
 
       <aside class="trajetoria-nav">
+        <div class="traj-path" aria-hidden="true">
+          <div class="path-line" style="left:93px; top:17px;"></div>
+          <div class="path-line" style="left:70px; top:55px;"></div>
+          <div class="path-line" style="left:47px; top:93px;"></div>
+          <div class="path-node active" data-target="proj-01" style="left:76px; top:0; --n-accent:#2dd4bf"><span>01</span></div>
+          <div class="path-node" data-target="proj-02" style="left:53px; top:38px; --n-accent:#4f8ff0"><span>02</span></div>
+          <div class="path-node" data-target="proj-03" style="left:30px; top:76px; --n-accent:#22d3ee"><span>03</span></div>
+          <div class="path-node" data-target="proj-04" style="left:7px; top:114px; --n-accent:#f2c14e"><span>04</span></div>
+        </div>
         <ul class="trajetoria-list">
           <li data-target="proj-01" style="--item-accent:#2dd4bf" class="active">
             <a href="#proj-01"><span class="traj-num">01</span> Fila Prioritária</a>
@@ -225,7 +234,10 @@
                 <li>Painel público mostra senha e sala, nunca nome ou CPF.</li>
               </ul>
               <ul class="projeto-tags"><li>Reflex</li><li>Xano</li><li>OpenSpec</li></ul>
-              <a href="https://github.com/leonardo-sferreira/ps-fila-prioritaria" target="_blank" rel="noopener" class="projeto-link">Ver repositório →</a>
+              <div class="traj-actions">
+                <a href="https://github.com/leonardo-sferreira/ps-fila-prioritaria" target="_blank" rel="noopener" class="projeto-link">Ver repositório →</a>
+                <button type="button" class="btn-case" data-project="proj-01">Ver case completo</button>
+              </div>
             </div>
           </div>
         </article>
@@ -245,7 +257,10 @@
                 <li>Toda decisão relevante fica auditada: quem fez, o quê, quando e por quê.</li>
               </ul>
               <ul class="projeto-tags"><li>Streamlit</li><li>Xano</li><li>Supabase</li></ul>
-              <a href="https://github.com/leonardo-sferreira/conectahr" target="_blank" rel="noopener" class="projeto-link">Ver repositório →</a>
+              <div class="traj-actions">
+                <a href="https://github.com/leonardo-sferreira/conectahr" target="_blank" rel="noopener" class="projeto-link">Ver repositório →</a>
+                <button type="button" class="btn-case" data-project="proj-02">Ver case completo</button>
+              </div>
             </div>
           </div>
         </article>
@@ -265,7 +280,10 @@
                 <li>Protótipo navegável completo no Figma, telas organizadas por fluxo.</li>
               </ul>
               <ul class="projeto-tags"><li>Figma</li><li>FlutterFlow</li><li>UX/UI</li></ul>
-              <a href="https://www.figma.com/design/iRn8igu0iCwyqYTathrz9P/Sabor-local?node-id=0-1" target="_blank" rel="noopener" class="projeto-link">Ver protótipo →</a>
+              <div class="traj-actions">
+                <a href="https://www.figma.com/design/iRn8igu0iCwyqYTathrz9P/Sabor-local?node-id=0-1" target="_blank" rel="noopener" class="projeto-link">Ver protótipo →</a>
+                <button type="button" class="btn-case" data-project="proj-03">Ver case completo</button>
+              </div>
             </div>
           </div>
         </article>
@@ -299,7 +317,10 @@
                 <li>Fecha o mês automaticamente: entradas, saídas, resultado e orçamento estourado.</li>
               </ul>
               <ul class="projeto-tags"><li>Python</li><li>Telegram Bot API</li><li>Notion API</li></ul>
-              <span class="projeto-link projeto-link--static">Código fonte privado</span>
+              <div class="traj-actions">
+                <span class="projeto-link projeto-link--static">Código fonte privado</span>
+                <button type="button" class="btn-case" data-project="proj-04">Ver case completo</button>
+              </div>
             </div>
           </div>
         </article>
@@ -307,6 +328,32 @@
       </div>
     </div>
   </section>
+
+  <!-- MODAL: CASE COMPLETO -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <button type="button" class="modal-close" id="modalClose" aria-label="Fechar">✕</button>
+
+      <div class="modal-gallery" id="modalGallery">
+        <button type="button" class="modal-nav prev" id="galPrev" aria-label="Imagem anterior">‹</button>
+        <img id="modalImg" src="" alt="">
+        <button type="button" class="modal-nav next" id="galNext" aria-label="Próxima imagem">›</button>
+        <div class="modal-dots" id="galDots"></div>
+      </div>
+
+      <div class="modal-body">
+        <span class="modal-category" id="modalCategory"></span>
+        <h3 id="modalTitle"></h3>
+        <div class="modal-role">
+          <strong>Função &amp; desafio</strong>
+          <p id="modalRole"></p>
+        </div>
+        <div class="modal-desc" id="modalDesc"></div>
+        <ul class="projeto-tags" id="modalTags"></ul>
+        <a href="#" class="projeto-link" id="modalLink" target="_blank" rel="noopener">Ver repositório →</a>
+      </div>
+    </div>
+  </div>
 
   <!-- CONTATO -->
   <section class="contato" id="contato">

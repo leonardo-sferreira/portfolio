@@ -234,6 +234,7 @@ if (heroCanvas && !window.matchMedia("(prefers-reduced-motion: reduce)").matches
 /* ---------- TRAJETÓRIA: SCROLL-SPY ---------- */
 const trajCases = document.querySelectorAll(".traj-case");
 const trajNavItems = document.querySelectorAll(".trajetoria-list li");
+const trajPathNodes = document.querySelectorAll(".path-node");
 
 if (trajCases.length && trajNavItems.length) {
   const trajObserver = new IntersectionObserver(
@@ -244,12 +245,161 @@ if (trajCases.length && trajNavItems.length) {
           trajNavItems.forEach((li) => {
             li.classList.toggle("active", li.dataset.target === id);
           });
+          trajPathNodes.forEach((node) => {
+            node.classList.toggle("active", node.dataset.target === id);
+          });
         }
       });
     },
     { rootMargin: "-40% 0px -50% 0px", threshold: 0 }
   );
   trajCases.forEach((el) => trajObserver.observe(el));
+}
+
+/* ---------- MODAL: CASE COMPLETO ---------- */
+const PROJECTS = {
+  "proj-01": {
+    category: "Engenharia de Software · Saúde",
+    title: "Fila Prioritária — Pronto-Socorro",
+    role: "Como Product Owner do time, defini as regras de priorização clínica, desenhei o protótipo das telas e modelei o banco de dados — depois acompanhei a equipe de back-end e front-end na implementação.",
+    desc: [
+      "O desafio era substituir a fila por ordem de chegada de um pronto-socorro por um sistema que prioriza de verdade quem precisa de atendimento mais urgente, sem perder transparência para quem está esperando.",
+      "Modelei as regras de pontuação clínica (sintomas + sinais vitais), o fluxo de triagem, o direcionamento por especialidade e o painel público — que mostra apenas senha e sala, nunca dados pessoais. O backend já tem 19 tabelas publicadas no Xano, e a primeira fatia vertical (cadastro de pacientes e ficha de atendimento) já está em produção.",
+    ],
+    images: [
+      { src: "assets/projetos/ps-fila-totem.png", alt: "Totem de autoatendimento do pronto-socorro" },
+      { src: "assets/projetos/ps-fila-painel.png", alt: "Painel público de chamadas" },
+      { src: "assets/projetos/ps-fila-admin.png", alt: "Tela do administrador — fila e equipe" },
+    ],
+    tags: ["Reflex", "Xano", "OpenSpec"],
+    link: { href: "https://github.com/leonardo-sferreira/ps-fila-prioritaria", text: "Ver repositório →" },
+  },
+  "proj-02": {
+    category: "Engenharia de Software · RH",
+    title: "ConectaRH",
+    role: "Participei do desenho das regras de negócio e do modelo de dados, além de construir boa parte das telas em Streamlit e a integração com o backend em Xano.",
+    desc: [
+      "O ConectaRH nasceu pra tirar RH, gestores e colaboradores das planilhas e do e-mail. Hoje a plataforma cobre ponto eletrônico (no padrão REP-P), férias pela CLT, documentos, benefícios, organograma e desligamento — com quatro perfis de acesso e auditoria de cada decisão relevante.",
+      "O backend já tem 59 tabelas, 228 endpoints e 909 verificações automatizadas rodando em CI a cada Pull Request; o frontend tem 22 telas testadas sem depender de rede.",
+    ],
+    images: [
+      { src: "assets/projetos/conectarh-inicio.png", alt: "Tela inicial do ConectaRH" },
+      { src: "assets/projetos/conectarh-perfil.png", alt: "Tela de perfil do colaborador" },
+      { src: "assets/projetos/conectarh-ponto.png", alt: "Tela de ponto eletrônico" },
+    ],
+    tags: ["Streamlit", "Xano", "Supabase"],
+    link: { href: "https://github.com/leonardo-sferreira/conectahr", text: "Ver repositório →" },
+  },
+  "proj-03": {
+    category: "UX/UI · Prototipação",
+    title: "Sabor Local",
+    role: "Fiz o design de ponta a ponta no Figma — fluxos, telas e protótipo navegável — pensando numa experiência de delivery tão fluida quanto a de apps grandes como o iFood.",
+    desc: [
+      "O Sabor Local é um protótipo de app de delivery focado em culinária mineira. Desenhei o fluxo completo: login e cadastro, cardápio por categoria com sugestão do chef, carrinho, formas de pagamento, acompanhamento do pedido com mapa e avaliação da entrega.",
+      "O protótipo no Figma está organizado por fluxo (acesso, cardápio, pagamento, endereço, pedido e perfil), pronto para virar implementação real.",
+    ],
+    images: [
+      { src: "assets/projetos/sabor-local-home.png", alt: "Tela inicial do app com cardápio" },
+      { src: "assets/projetos/sabor-local-carrinho.png", alt: "Tela de carrinho de compras" },
+      { src: "assets/projetos/sabor-local-pagamento.png", alt: "Tela de pagamento" },
+    ],
+    tags: ["Figma", "FlutterFlow", "UX/UI"],
+    link: { href: "https://www.figma.com/design/iRn8igu0iCwyqYTathrz9P/Sabor-local?node-id=0-1", text: "Ver protótipo →" },
+  },
+  "proj-04": {
+    category: "Automação · Uso pessoal",
+    title: "Bot de Finanças",
+    role: "Projetei e implementei sozinho, do fluxo de conversa no Telegram até a integração com a API do Notion.",
+    desc: [
+      "Criei esse bot pra parar de esquecer de registrar gasto. Ele entende comandos e mensagens curtas (tipo '45,90 almoço'), guarda tudo num dashboard de finanças pessoais no Notion e roda rotinas automáticas: aviso de fatura e parcela que vence em 3 dias, lembrete às 21h se eu não lancei nada no dia, resumo semanal aos domingos e fechamento do mês no dia 1º.",
+      "Se o bot fica desligado em algum momento, ele recupera o dia quando volta, sem duplicar lançamento. Repositório privado — sem prints de tela públicos por enquanto.",
+    ],
+    images: [],
+    tags: ["Python", "Telegram Bot API", "Notion API"],
+    link: null,
+  },
+};
+
+const modalOverlay = document.getElementById("modalOverlay");
+const modalImg = document.getElementById("modalImg");
+const modalGallery = document.getElementById("modalGallery");
+const galDots = document.getElementById("galDots");
+const modalCategory = document.getElementById("modalCategory");
+const modalTitle = document.getElementById("modalTitle");
+const modalRole = document.getElementById("modalRole");
+const modalDesc = document.getElementById("modalDesc");
+const modalTags = document.getElementById("modalTags");
+const modalLink = document.getElementById("modalLink");
+
+if (modalOverlay) {
+  let galImages = [];
+  let galIndex = 0;
+
+  function renderGallery() {
+    if (!galImages.length) {
+      modalGallery.style.display = "none";
+      return;
+    }
+    modalGallery.style.display = "flex";
+    modalImg.src = galImages[galIndex].src;
+    modalImg.alt = galImages[galIndex].alt;
+    galDots.innerHTML = "";
+    galImages.forEach((_, i) => {
+      const dot = document.createElement("span");
+      if (i === galIndex) dot.classList.add("active");
+      dot.addEventListener("click", () => { galIndex = i; renderGallery(); });
+      galDots.appendChild(dot);
+    });
+    const showNav = galImages.length > 1;
+    document.getElementById("galPrev").style.display = showNav ? "block" : "none";
+    document.getElementById("galNext").style.display = showNav ? "block" : "none";
+  }
+
+  function openModal(id) {
+    const p = PROJECTS[id];
+    if (!p) return;
+    galImages = p.images;
+    galIndex = 0;
+    renderGallery();
+    modalCategory.textContent = p.category;
+    modalTitle.textContent = p.title;
+    modalRole.textContent = p.role;
+    modalDesc.innerHTML = p.desc.map((para) => `<p>${para}</p>`).join("");
+    modalTags.innerHTML = p.tags.map((t) => `<li>${t}</li>`).join("");
+    if (p.link) {
+      modalLink.style.display = "inline-flex";
+      modalLink.href = p.link.href;
+      modalLink.textContent = p.link.text;
+    } else {
+      modalLink.style.display = "none";
+    }
+    modalOverlay.classList.add("open");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeModal() {
+    modalOverlay.classList.remove("open");
+    document.body.style.overflow = "";
+  }
+
+  document.querySelectorAll(".btn-case").forEach((btn) => {
+    btn.addEventListener("click", () => openModal(btn.dataset.project));
+  });
+  document.getElementById("modalClose").addEventListener("click", closeModal);
+  modalOverlay.addEventListener("click", (e) => {
+    if (e.target === modalOverlay) closeModal();
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeModal();
+  });
+  document.getElementById("galPrev").addEventListener("click", () => {
+    galIndex = (galIndex - 1 + galImages.length) % galImages.length;
+    renderGallery();
+  });
+  document.getElementById("galNext").addEventListener("click", () => {
+    galIndex = (galIndex + 1) % galImages.length;
+    renderGallery();
+  });
 }
 
 /* ---------- SERVIÇOS SWITCHER ---------- */
