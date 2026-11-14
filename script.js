@@ -27,7 +27,7 @@ revealEls.forEach((el) => revealObserver.observe(el));
 const roleTextEl = document.getElementById("roleText");
 
 if (roleTextEl) {
-  const roles = ["Desenvolvedor Web", "Desenvolvedor Mobile", "Automações", "Banco de Dados"];
+  const roles = ["Web", "Mobile", "Automações", "Banco de Dados"];
   let roleIndex = 0;
 
   setInterval(() => {

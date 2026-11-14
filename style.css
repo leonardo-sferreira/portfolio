@@ -194,7 +194,18 @@ h2 {
 .hero-sub {
   color: var(--accent-light);
   font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-size: 0.85rem;
   margin-bottom: 8px;
+}
+
+.hero-value {
+  color: var(--text-muted);
+  font-size: 1.15rem;
+  max-width: 540px;
+  margin-bottom: 22px;
+  line-height: 1.55;
 }
 
 .hero h1 {
