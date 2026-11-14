@@ -548,6 +548,53 @@ h2 {
 .projeto-card[data-accent="teal"] { --card-accent: #3f8f7a; }
 .projeto-card[data-accent="mustard"] { --card-accent: #d9a441; }
 .projeto-card[data-accent="terracotta"] { --card-accent: #e2672f; }
+.projeto-card[data-accent="amber"] { --card-accent: #c9922b; }
+
+/* thumb sem screenshot: diagrama do fluxo de automação */
+.projeto-thumb--diagram {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  background:
+    radial-gradient(circle at 30% 20%, rgba(201,146,43,0.14), transparent 55%),
+    var(--bg);
+}
+
+.diagram-icon {
+  width: 56px;
+  height: 56px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+.diagram-icon.is-accent { color: var(--card-accent); }
+
+.diagram-arrow {
+  width: 46px;
+  height: 14px;
+  color: var(--card-accent);
+  opacity: 0.8;
+}
+
+.projeto-card:not(:hover) .projeto-thumb--diagram svg {
+  transition: transform 0.4s ease;
+}
+.projeto-card:hover .projeto-thumb--diagram svg {
+  transform: translateY(-2px);
+}
+
+.projeto-card--static {
+  cursor: default;
+}
+.projeto-card--static:hover {
+  transform: none;
+  border-color: rgba(255,255,255,0.07);
+  box-shadow: none;
+}
+.projeto-card--static .projeto-link {
+  color: var(--text-muted);
+  font-weight: 500;
+}
 
 /* ---------- CONTATO ---------- */
 .contato {
