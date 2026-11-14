@@ -233,20 +233,16 @@ if (heroCanvas && !window.matchMedia("(prefers-reduced-motion: reduce)").matches
 
 /* ---------- TRAJETÓRIA: SCROLL-SPY ---------- */
 const trajCases = document.querySelectorAll(".traj-case");
-const trajNavItems = document.querySelectorAll(".trajetoria-list li");
-const trajPathNodes = document.querySelectorAll(".path-node");
+const trajPathItems = document.querySelectorAll(".path-item");
 
-if (trajCases.length && trajNavItems.length) {
+if (trajCases.length && trajPathItems.length) {
   const trajObserver = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
           const id = entry.target.id;
-          trajNavItems.forEach((li) => {
-            li.classList.toggle("active", li.dataset.target === id);
-          });
-          trajPathNodes.forEach((node) => {
-            node.classList.toggle("active", node.dataset.target === id);
+          trajPathItems.forEach((item) => {
+            item.classList.toggle("active", item.dataset.target === id);
           });
         }
       });
@@ -263,9 +259,10 @@ const PROJECTS = {
     title: "Fila Prioritária — Pronto-Socorro",
     role: "Como Product Owner do time, defini as regras de priorização clínica, desenhei o protótipo das telas e modelei o banco de dados — depois acompanhei a equipe de back-end e front-end na implementação.",
     desc: [
-      "O desafio era substituir a fila por ordem de chegada de um pronto-socorro por um sistema que prioriza de verdade quem precisa de atendimento mais urgente, sem perder transparência para quem está esperando.",
-      "Modelei as regras de pontuação clínica (sintomas + sinais vitais), o fluxo de triagem, o direcionamento por especialidade e o painel público — que mostra apenas senha e sala, nunca dados pessoais. O backend já tem 19 tabelas publicadas no Xano, e a primeira fatia vertical (cadastro de pacientes e ficha de atendimento) já está em produção.",
+      "O desafio era substituir a fila por ordem de chegada de um pronto-socorro por uma fila que prioriza de verdade quem está pior — sem perder transparência para quem está esperando.",
+      "O sistema cuida da triagem (sintomas e sinais vitais viram uma classificação de risco), direciona cada ficha para a especialidade certa e mostra as chamadas num painel público que nunca expõe nome ou CPF.",
     ],
+    tech: "Por trás da tela: front-end em Reflex, back-end em Xano com 19 tabelas já publicadas, e a primeira fatia (cadastro de pacientes e ficha de atendimento) já em produção.",
     images: [
       { src: "assets/projetos/ps-fila-totem.png", alt: "Totem de autoatendimento do pronto-socorro" },
       { src: "assets/projetos/ps-fila-painel.png", alt: "Painel público de chamadas" },
@@ -279,9 +276,10 @@ const PROJECTS = {
     title: "ConectaRH",
     role: "Participei do desenho das regras de negócio e do modelo de dados, além de construir boa parte das telas em Streamlit e a integração com o backend em Xano.",
     desc: [
-      "O ConectaRH nasceu pra tirar RH, gestores e colaboradores das planilhas e do e-mail. Hoje a plataforma cobre ponto eletrônico (no padrão REP-P), férias pela CLT, documentos, benefícios, organograma e desligamento — com quatro perfis de acesso e auditoria de cada decisão relevante.",
-      "O backend já tem 59 tabelas, 228 endpoints e 909 verificações automatizadas rodando em CI a cada Pull Request; o frontend tem 22 telas testadas sem depender de rede.",
+      "O ConectaRH nasceu pra tirar RH, gestores e colaboradores das planilhas e do e-mail — um lugar só para ponto, férias, documentos e desligamento, onde cada perfil vê só o que pode ver.",
+      "Toda decisão importante (aprovar férias, corrigir ponto, mudar um dado cadastral) fica registrada: quem fez, quando e por quê.",
     ],
+    tech: "Por trás da tela: backend com 59 tabelas e 228 endpoints no Xano, frontend com 22 telas em Streamlit, e 909 verificações automatizadas rodando a cada Pull Request.",
     images: [
       { src: "assets/projetos/conectarh-inicio.png", alt: "Tela inicial do ConectaRH" },
       { src: "assets/projetos/conectarh-perfil.png", alt: "Tela de perfil do colaborador" },
@@ -295,9 +293,10 @@ const PROJECTS = {
     title: "Sabor Local",
     role: "Fiz o design de ponta a ponta no Figma — fluxos, telas e protótipo navegável — pensando numa experiência de delivery tão fluida quanto a de apps grandes como o iFood.",
     desc: [
-      "O Sabor Local é um protótipo de app de delivery focado em culinária mineira. Desenhei o fluxo completo: login e cadastro, cardápio por categoria com sugestão do chef, carrinho, formas de pagamento, acompanhamento do pedido com mapa e avaliação da entrega.",
-      "O protótipo no Figma está organizado por fluxo (acesso, cardápio, pagamento, endereço, pedido e perfil), pronto para virar implementação real.",
+      "O Sabor Local é um protótipo de app de delivery de comida mineira, pensado pra ter a mesma fluidez de apps grandes como o iFood — do cardápio ao acompanhamento do pedido no mapa.",
+      "Desenhei o fluxo inteiro: login, cardápio por categoria com sugestão do chef, carrinho, pagamento, endereço e avaliação da entrega.",
     ],
+    tech: "Por trás da tela: protótipo navegável completo no Figma, organizado por fluxo (acesso, cardápio, pagamento, endereço, pedido e perfil), pronto para virar implementação real.",
     images: [
       { src: "assets/projetos/sabor-local-home.png", alt: "Tela inicial do app com cardápio" },
       { src: "assets/projetos/sabor-local-carrinho.png", alt: "Tela de carrinho de compras" },
@@ -311,9 +310,10 @@ const PROJECTS = {
     title: "Bot de Finanças",
     role: "Projetei e implementei sozinho, do fluxo de conversa no Telegram até a integração com a API do Notion.",
     desc: [
-      "Criei esse bot pra parar de esquecer de registrar gasto. Ele entende comandos e mensagens curtas (tipo '45,90 almoço'), guarda tudo num dashboard de finanças pessoais no Notion e roda rotinas automáticas: aviso de fatura e parcela que vence em 3 dias, lembrete às 21h se eu não lancei nada no dia, resumo semanal aos domingos e fechamento do mês no dia 1º.",
-      "Se o bot fica desligado em algum momento, ele recupera o dia quando volta, sem duplicar lançamento. Repositório privado — sem prints de tela públicos por enquanto.",
+      "Criei esse bot pra resolver um problema bem pessoal: parar de esquecer de anotar gasto. Ele entende uma mensagem curta, tipo '45,90 almoço', e já guarda tudo organizado.",
+      "Também avisa sozinho quando uma fatura ou parcela tá perto de vencer, pergunta no fim do dia se eu lancei meus gastos, manda um resumo da semana e fecha o mês sozinho.",
     ],
+    tech: "Por trás da tela: bot em Python integrado à API do Telegram e à API do Notion. Repositório privado, sem prints públicos por enquanto.",
     images: [],
     tags: ["Python", "Telegram Bot API", "Notion API"],
     link: null,
@@ -364,7 +364,8 @@ if (modalOverlay) {
     modalCategory.textContent = p.category;
     modalTitle.textContent = p.title;
     modalRole.textContent = p.role;
-    modalDesc.innerHTML = p.desc.map((para) => `<p>${para}</p>`).join("");
+    modalDesc.innerHTML = p.desc.map((para) => `<p>${para}</p>`).join("") +
+      (p.tech ? `<p class="tech-note">${p.tech}</p>` : "");
     modalTags.innerHTML = p.tags.map((t) => `<li>${t}</li>`).join("");
     if (p.link) {
       modalLink.style.display = "inline-flex";

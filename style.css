@@ -503,8 +503,8 @@ h2 {
 
 .trajetoria-layout {
   display: grid;
-  grid-template-columns: 200px 1fr;
-  gap: 64px;
+  grid-template-columns: 240px 1fr;
+  gap: 48px;
   max-width: 1040px;
   margin: 0 auto;
   align-items: start;
@@ -517,94 +517,62 @@ h2 {
 
 .traj-path {
   position: relative;
-  width: 125px;
-  height: 150px;
-  margin-bottom: 30px;
+  width: 230px;
+  height: 234px;
 }
 
 .path-line {
   position: absolute;
-  width: 44.4px;
   height: 2px;
   background: rgba(255,255,255,0.12);
-  transform: rotate(121.2deg);
   transform-origin: left center;
 }
 
-.path-node {
+.path-item {
   position: absolute;
-  width: 34px;
-  height: 34px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+}
+
+.path-diamond {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
   background: var(--bg-alt);
   border: 2px solid rgba(255,255,255,0.15);
   transform: rotate(45deg);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: border-color 0.3s, box-shadow 0.3s, background 0.3s;
+  transition: border-color 0.3s, box-shadow 0.3s;
 }
 
-.path-node span {
+.path-diamond span {
   display: inline-block;
   transform: rotate(-45deg);
   font-family: var(--font-head);
-  font-size: 0.65rem;
+  font-size: 0.6rem;
   color: var(--text-muted);
   transition: color 0.3s;
 }
 
-.path-node.active {
+.path-label {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  transition: color 0.3s, font-weight 0.3s;
+}
+
+.path-item:hover .path-label { color: var(--text); }
+
+.path-item.active .path-diamond {
   border-color: var(--n-accent);
-  box-shadow: 0 0 16px -2px var(--n-accent);
+  box-shadow: 0 0 14px -2px var(--n-accent);
 }
-.path-node.active span { color: var(--text); }
-
-.trajetoria-list {
-  list-style: none;
-  position: relative;
-  padding-left: 24px;
-  border-left: 2px solid rgba(255,255,255,0.08);
-}
-
-.trajetoria-list li {
-  position: relative;
-  margin-bottom: 26px;
-}
-
-.trajetoria-list li::before {
-  content: "";
-  position: absolute;
-  left: -29px;
-  top: 5px;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--text-muted);
-  border: 2px solid var(--bg);
-  transition: background 0.3s, transform 0.3s;
-}
-
-.trajetoria-list li.active::before {
-  background: var(--item-accent, var(--accent));
-  transform: scale(1.3);
-}
-
-.trajetoria-list a {
-  color: var(--text-muted);
-  font-size: 0.9rem;
-  transition: color 0.3s;
-}
-
-.trajetoria-list li.active a {
-  color: var(--text);
-  font-weight: 600;
-}
-
-.traj-num {
-  font-family: var(--font-head);
-  font-size: 0.78rem;
-  margin-right: 4px;
-}
+.path-item.active .path-diamond span { color: var(--text); }
+.path-item.active .path-label { color: var(--text); font-weight: 600; }
 
 .trajetoria-content {
   display: flex;
@@ -943,6 +911,15 @@ h2 {
   color: var(--text-muted);
   font-size: 0.95rem;
   margin-bottom: 14px;
+}
+
+.modal-desc p.tech-note {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  opacity: 0.8;
+  border-top: 1px dashed rgba(255,255,255,0.12);
+  padding-top: 12px;
+  margin-top: 4px;
 }
 
 .modal-body .projeto-tags { margin-bottom: 20px; }
