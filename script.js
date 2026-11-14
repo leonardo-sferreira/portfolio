@@ -74,13 +74,6 @@ function resetDraw(svg) {
 }
 document.querySelectorAll(".stage-icon, .diagram-icon, .diagram-arrow").forEach(prepareDraw);
 
-/* ---------- LINKEDIN: placeholder ainda não preenchido ---------- */
-const linkedinLink = document.getElementById("linkedinLink");
-if (linkedinLink) {
-  linkedinLink.addEventListener("click", (e) => {
-    if (linkedinLink.getAttribute("href") === "#") e.preventDefault();
-  });
-}
 
 /* ---------- PRE-LOADER: CONSTELAÇÃO ---------- */
 const preloader = document.getElementById("preloader");
