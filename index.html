@@ -82,44 +82,48 @@
     </p>
   </section>
 
-  <!-- SERVIÇOS -->
+  <!-- SERVIÇOS (scroll pinado) -->
   <section class="servicos" id="servicos">
     <span class="section-tag reveal">O que eu faço</span>
     <h2 class="reveal">Serviços</h2>
 
-    <div class="servicos-switcher reveal" data-active="web" style="--delay:0.1s">
+    <div class="scrolly" id="scrolly">
+      <div class="scrolly-sticky" id="stickyBox">
 
-      <div class="tabs-list" role="tablist">
-
-        <button class="tab-item active" data-tab="web" role="tab" aria-selected="true" aria-controls="panel-web" id="tab-web">
-          <span class="tab-index">01</span>
-          <span class="tab-name">Desenvolvimento Web</span>
-        </button>
-
-        <button class="tab-item" data-tab="mobile" role="tab" aria-selected="false" aria-controls="panel-mobile" id="tab-mobile">
-          <span class="tab-index">02</span>
-          <span class="tab-name">Mobile</span>
-        </button>
-
-        <button class="tab-item" data-tab="automacao" role="tab" aria-selected="false" aria-controls="panel-automacao" id="tab-automacao">
-          <span class="tab-index">03</span>
-          <span class="tab-name">Automações</span>
-        </button>
-
-        <button class="tab-item" data-tab="dados" role="tab" aria-selected="false" aria-controls="panel-dados" id="tab-dados">
-          <span class="tab-index">04</span>
-          <span class="tab-name">Banco de Dados</span>
-        </button>
-
-        <div class="progress-track">
-          <div class="progress-fill" id="servicosProgress"></div>
+        <div class="scrolly-text">
+          <div class="stage-copy active" data-stage="0">
+            <span class="eyebrow">01 · Desenvolvimento Web</span>
+            <h3>Sites e sistemas sob medida</h3>
+            <p>Sites, landing pages e sistemas web sob medida, do zero ou evoluindo o que já existe — com atenção a performance e código que se sustenta no tempo.</p>
+            <ul class="projeto-tags"><li>React</li><li>Node.js</li><li>APIs</li><li>SSR</li></ul>
+          </div>
+          <div class="stage-copy" data-stage="1">
+            <span class="eyebrow">02 · Mobile</span>
+            <h3>Apps que resolvem, não inflam</h3>
+            <p>Aplicativos simples e funcionais para Android e iOS, pensados para resolver um problema de verdade — sem inchar o app com telas que ninguém usa.</p>
+            <ul class="projeto-tags"><li>React Native</li><li>Android</li><li>iOS</li><li>APIs</li></ul>
+          </div>
+          <div class="stage-copy" data-stage="2">
+            <span class="eyebrow">03 · Automações</span>
+            <h3>Tarefa repetitiva vira script</h3>
+            <p>Scripts e integrações que tiram tarefa repetitiva do seu caminho — planilhas, rotinas de dados, processos manuais que viram um botão ou um cron job.</p>
+            <ul class="projeto-tags"><li>Python</li><li>Scripts</li><li>Integrações</li><li>Cron Jobs</li></ul>
+          </div>
+          <div class="stage-copy" data-stage="3">
+            <span class="eyebrow">04 · Banco de Dados</span>
+            <h3>Estrutura que aguenta crescer</h3>
+            <p>Modelagem, consultas e integração de bancos de dados — estrutura pensada para aguentar o crescimento do produto sem virar gargalo.</p>
+            <ul class="projeto-tags"><li>PostgreSQL</li><li>MySQL</li><li>Modelagem</li><li>SQL</li></ul>
+          </div>
         </div>
-      </div>
 
-      <div class="tabs-panels">
+        <div class="scrolly-visual">
+          <svg class="ring-svg" viewBox="0 0 160 160">
+            <circle class="ring-bg" cx="80" cy="80" r="74"/>
+            <circle class="ring-fill" id="ringFill" cx="80" cy="80" r="74"/>
+          </svg>
 
-        <div class="tab-panel active" data-panel="web" role="tabpanel" id="panel-web" aria-labelledby="tab-web">
-          <svg class="panel-icon" viewBox="0 0 120 120" fill="none">
+          <svg class="stage-icon active" data-stage="0" viewBox="0 0 120 120" fill="none">
             <rect x="14" y="22" width="92" height="64" rx="8" stroke="currentColor" stroke-width="3"/>
             <path d="M14 38h92" stroke="currentColor" stroke-width="3"/>
             <circle cx="24" cy="30" r="2.5" fill="currentColor"/>
@@ -127,61 +131,34 @@
             <circle cx="42" cy="30" r="2.5" fill="currentColor"/>
             <path d="M44 56l-12 10 12 10M76 56l12 10-12 10M64 52l-8 28" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
-          <div class="panel-text">
-            <h3>Desenvolvimento Web</h3>
-            <p>Sites, landing pages e sistemas web sob medida, do zero ou evoluindo o que já existe — com atenção a performance e código que se sustenta no tempo.</p>
-            <ul class="tag-list">
-              <li>React</li><li>Node.js</li><li>APIs</li><li>SSR</li>
-            </ul>
-          </div>
-        </div>
 
-        <div class="tab-panel" data-panel="mobile" role="tabpanel" id="panel-mobile" aria-labelledby="tab-mobile">
-          <svg class="panel-icon" viewBox="0 0 120 120" fill="none">
+          <svg class="stage-icon" data-stage="1" viewBox="0 0 120 120" fill="none">
             <rect x="36" y="14" width="48" height="92" rx="9" stroke="currentColor" stroke-width="3"/>
             <path d="M36 90h48" stroke="currentColor" stroke-width="3"/>
             <circle cx="60" cy="98" r="3" fill="currentColor"/>
             <path d="M50 46l-8 14 8 14M70 46l8 14-8 14M64 42l-8 36" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
-          <div class="panel-text">
-            <h3>Mobile</h3>
-            <p>Aplicativos simples e funcionais para Android e iOS, pensados para resolver um problema de verdade — sem inchar o app com telas que ninguém usa.</p>
-            <ul class="tag-list">
-              <li>React Native</li><li>Android</li><li>iOS</li><li>APIs</li>
-            </ul>
-          </div>
-        </div>
 
-        <div class="tab-panel" data-panel="automacao" role="tabpanel" id="panel-automacao" aria-labelledby="tab-automacao">
-          <svg class="panel-icon" viewBox="0 0 120 120" fill="none">
+          <svg class="stage-icon" data-stage="2" viewBox="0 0 120 120" fill="none">
             <circle cx="42" cy="42" r="14" stroke="currentColor" stroke-width="3"/>
             <circle cx="80" cy="78" r="14" stroke="currentColor" stroke-width="3"/>
             <path d="M42 56v10a8 8 0 0 0 8 8h18M68 78h2" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
             <path d="M56 70l6 4-6 4" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
             <path d="M58 36h24M70 24v24" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-dasharray="1 7"/>
           </svg>
-          <div class="panel-text">
-            <h3>Automações</h3>
-            <p>Scripts e integrações que tiram tarefa repetitiva do seu caminho — planilhas, rotinas de dados, processos manuais que viram um botão ou um cron job.</p>
-            <ul class="tag-list">
-              <li>Python</li><li>Scripts</li><li>Integrações</li><li>Cron Jobs</li>
-            </ul>
-          </div>
-        </div>
 
-        <div class="tab-panel" data-panel="dados" role="tabpanel" id="panel-dados" aria-labelledby="tab-dados">
-          <svg class="panel-icon" viewBox="0 0 120 120" fill="none">
+          <svg class="stage-icon" data-stage="3" viewBox="0 0 120 120" fill="none">
             <ellipse cx="60" cy="30" rx="34" ry="12" stroke="currentColor" stroke-width="3"/>
             <path d="M26 30v24c0 6.6 15.2 12 34 12s34-5.4 34-12V30" stroke="currentColor" stroke-width="3"/>
             <path d="M26 54v24c0 6.6 15.2 12 34 12s34-5.4 34-12V54" stroke="currentColor" stroke-width="3"/>
           </svg>
-          <div class="panel-text">
-            <h3>Banco de Dados</h3>
-            <p>Modelagem, consultas e integração de bancos de dados — estrutura pensada para aguentar o crescimento do produto sem virar gargalo.</p>
-            <ul class="tag-list">
-              <li>PostgreSQL</li><li>MySQL</li><li>Modelagem</li><li>SQL</li>
-            </ul>
-          </div>
+        </div>
+
+        <div class="scrolly-rail" id="rail">
+          <div class="rail-dot active" data-stage="0"></div>
+          <div class="rail-dot" data-stage="1"></div>
+          <div class="rail-dot" data-stage="2"></div>
+          <div class="rail-dot" data-stage="3"></div>
         </div>
 
       </div>

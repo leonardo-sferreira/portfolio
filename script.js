@@ -452,71 +452,44 @@ if (modalOverlay) {
   });
 }
 
-/* ---------- SERVIÇOS SWITCHER ---------- */
-const switcher = document.querySelector(".servicos-switcher");
+/* ---------- SERVIÇOS: SCROLL PINADO ---------- */
+const scrolly = document.getElementById("scrolly");
 
-if (switcher) {
-  const tabs = Array.from(switcher.querySelectorAll(".tab-item"));
-  const panels = Array.from(switcher.querySelectorAll(".tab-panel"));
-  const progressFill = document.getElementById("servicosProgress");
-  const AUTOPLAY_MS = 5000;
-  let currentIndex = 0;
-  let autoplayTimer = null;
+if (scrolly) {
+  const STAGE_COLORS = ["#2dd4bf", "#4f8ff0", "#f2c14e", "#22d3ee"];
+  const STAGES = 4;
+  const RING_CIRC = 464.96;
 
-  function activate(index) {
-    currentIndex = index;
-    const key = tabs[index].dataset.tab;
+  const sticky = document.getElementById("stickyBox");
+  const ringFill = document.getElementById("ringFill");
+  const copies = scrolly.querySelectorAll(".stage-copy");
+  const icons = scrolly.querySelectorAll(".stage-icon");
+  const dots = scrolly.querySelectorAll(".rail-dot");
 
-    tabs.forEach((t, i) => {
-      t.classList.toggle("active", i === index);
-      t.setAttribute("aria-selected", i === index ? "true" : "false");
-    });
-    panels.forEach((p, i) => p.classList.toggle("active", i === index));
-    switcher.setAttribute("data-active", key);
-    centerTabInList(tabs[index]);
+  function updateScrolly() {
+    const rect = scrolly.getBoundingClientRect();
+    const total = rect.height - window.innerHeight;
+    const scrolled = Math.min(Math.max(-rect.top, 0), total);
+    const progress = total > 0 ? scrolled / total : 0;
+    const stage = Math.min(STAGES - 1, Math.floor(progress * STAGES));
 
-    restartProgress();
+    sticky.style.setProperty("--stage-color", STAGE_COLORS[stage]);
+    ringFill.style.strokeDashoffset = String(RING_CIRC * (1 - progress));
+
+    copies.forEach((c) => c.classList.toggle("active", Number(c.dataset.stage) === stage));
+    icons.forEach((i) => i.classList.toggle("active", Number(i.dataset.stage) === stage));
+    dots.forEach((d) => d.classList.toggle("active", Number(d.dataset.stage) === stage));
   }
 
-  function centerTabInList(tab) {
-    const list = tab.parentElement;
-    if (list.scrollWidth <= list.clientWidth) return;
-    const target = tab.offsetLeft - (list.clientWidth - tab.offsetWidth) / 2;
-    list.scrollTo({ left: Math.max(0, target), behavior: "smooth" });
-  }
-
-  function restartProgress() {
-    if (!progressFill) return;
-    progressFill.classList.remove("animate");
-    // força reflow para reiniciar a animação da barra
-    void progressFill.offsetWidth;
-    progressFill.classList.add("animate");
-  }
-
-  function next() {
-    activate((currentIndex + 1) % tabs.length);
-  }
-
-  function startAutoplay() {
-    stopAutoplay();
-    autoplayTimer = setInterval(next, AUTOPLAY_MS);
-  }
-
-  function stopAutoplay() {
-    if (autoplayTimer) clearInterval(autoplayTimer);
-  }
-
-  tabs.forEach((tab, i) => {
-    tab.addEventListener("click", () => {
-      activate(i);
-      startAutoplay();
-    });
+  let ticking = false;
+  window.addEventListener("scroll", () => {
+    if (!ticking) {
+      requestAnimationFrame(() => {
+        updateScrolly();
+        ticking = false;
+      });
+      ticking = true;
+    }
   });
-
-  // pausa o autoplay quando o mouse está sobre o switcher
-  switcher.addEventListener("mouseenter", stopAutoplay);
-  switcher.addEventListener("mouseleave", startAutoplay);
-
-  activate(0);
-  startAutoplay();
+  updateScrolly();
 }
