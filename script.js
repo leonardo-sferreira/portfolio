@@ -49,7 +49,7 @@ if (heroCanvas && !window.matchMedia("(prefers-reduced-motion: reduce)").matches
   let particles = [];
   let w = 0, h = 0, dpr = Math.min(window.devicePixelRatio || 1, 2);
 
-  const COLORS = ["229,122,80", "95,160,146"];
+  const COLORS = ["45,212,191", "79,143,240"];
   const LINK_DIST = 140;
   const MOUSE_DIST = 160;
 
@@ -126,7 +126,7 @@ if (heroCanvas && !window.matchMedia("(prefers-reduced-motion: reduce)").matches
           ctx.beginPath();
           ctx.moveTo(a.x, a.y);
           ctx.lineTo(b.x, b.y);
-          ctx.strokeStyle = `rgba(229,122,80,${0.14 * (1 - d / LINK_DIST)})`;
+          ctx.strokeStyle = `rgba(45,212,191,${0.14 * (1 - d / LINK_DIST)})`;
           ctx.lineWidth = 1;
           ctx.stroke();
         }
