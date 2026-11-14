@@ -376,6 +376,11 @@ if (modalOverlay) {
     }
     modalOverlay.classList.add("open");
     document.body.style.overflow = "hidden";
+
+    const modalBody = document.querySelector(".modal-body");
+    modalBody.classList.remove("anim-in");
+    void modalBody.offsetWidth;
+    modalBody.classList.add("anim-in");
   }
 
   function closeModal() {
@@ -385,6 +390,15 @@ if (modalOverlay) {
 
   document.querySelectorAll(".btn-case").forEach((btn) => {
     btn.addEventListener("click", () => openModal(btn.dataset.project));
+  });
+  document.querySelectorAll(".traj-media[data-project]").forEach((media) => {
+    media.addEventListener("click", () => openModal(media.dataset.project));
+    media.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        openModal(media.dataset.project);
+      }
+    });
   });
   document.getElementById("modalClose").addEventListener("click", closeModal);
   modalOverlay.addEventListener("click", (e) => {
