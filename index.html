@@ -49,6 +49,24 @@
     </div>
   </section>
 
+  <!-- NÚMEROS -->
+  <section class="stats" id="stats">
+    <div class="stats-grid">
+      <div class="stat-item reveal">
+        <span class="stat-number">4</span>
+        <span class="stat-label">projetos reais construídos</span>
+      </div>
+      <div class="stat-item reveal" style="--delay:0.08s">
+        <span class="stat-number">3</span>
+        <span class="stat-label">áreas — web, mobile e automação</span>
+      </div>
+      <div class="stat-item reveal" style="--delay:0.16s">
+        <span class="stat-number">100%</span>
+        <span class="stat-label">aprendizado com projeto real, não tutorial</span>
+      </div>
+    </div>
+  </section>
+
   <!-- SOBRE -->
   <section class="sobre" id="sobre">
     <span class="section-tag reveal">Quem sou eu</span>
@@ -166,91 +184,116 @@
     </div>
   </section>
 
-  <!-- PROJETOS -->
-  <section class="projetos" id="projetos">
+  <!-- PROJETOS / TRAJETÓRIA -->
+  <section class="trajetoria" id="projetos">
     <span class="section-tag reveal">Trabalhos</span>
-    <h2 class="reveal">Projetos</h2>
-    <div class="projetos-grid">
+    <h2 class="reveal">Minha trajetória</h2>
+    <p class="trajetoria-intro reveal">Quatro projetos, do acadêmico ao pessoal, cobrindo web, mobile, automação e banco de dados.</p>
 
-      <a href="https://github.com/leonardo-sferreira/ps-fila-prioritaria" target="_blank" rel="noopener"
-         class="projeto-card reveal" data-accent="teal" style="--delay:0.05s">
-        <div class="projeto-thumb">
-          <span class="projeto-status">Em desenvolvimento</span>
-          <img src="assets/projetos/ps-fila-painel.png" alt="Painel de chamadas do sistema de fila prioritária para pronto-socorro">
-        </div>
-        <div class="projeto-body">
-          <span class="projeto-num">01</span>
+    <div class="trajetoria-layout">
+
+      <aside class="trajetoria-nav">
+        <ul class="trajetoria-list">
+          <li data-target="proj-01" style="--item-accent:#3f8f7a" class="active">
+            <a href="#proj-01"><span class="traj-num">01</span> Fila Prioritária</a>
+          </li>
+          <li data-target="proj-02" style="--item-accent:#d9a441">
+            <a href="#proj-02"><span class="traj-num">02</span> ConectaRH</a>
+          </li>
+          <li data-target="proj-03" style="--item-accent:#e2672f">
+            <a href="#proj-03"><span class="traj-num">03</span> Sabor Local</a>
+          </li>
+          <li data-target="proj-04" style="--item-accent:#c9922b">
+            <a href="#proj-04"><span class="traj-num">04</span> Bot de Finanças</a>
+          </li>
+        </ul>
+      </aside>
+
+      <div class="trajetoria-content">
+
+        <article class="traj-case reveal" id="proj-01" data-accent="teal">
+          <span class="traj-eyebrow">Em desenvolvimento · Projeto acadêmico (Impacta)</span>
           <h3>Fila Prioritária — Pronto-Socorro</h3>
-          <p>Sistema que organiza a fila de um PS pela gravidade clínica, não pela ordem de chegada — triagem, direcionamento por especialidade e painel público sem dados pessoais.</p>
-          <ul class="projeto-tags">
-            <li>Reflex</li><li>Xano</li><li>OpenSpec</li>
-          </ul>
-          <span class="projeto-link">Ver repositório →</span>
-        </div>
-      </a>
+          <div class="traj-body">
+            <div class="traj-media"><img src="assets/projetos/ps-fila-painel.png" alt="Painel de chamadas do sistema de fila prioritária para pronto-socorro"></div>
+            <div class="traj-text">
+              <ul class="traj-bullets">
+                <li>Classifica cada paciente em Vermelha, Amarela ou Azul somando sintomas e sinais vitais — não é só ordem de chegada.</li>
+                <li>Direciona a ficha pra especialidade certa e distribui pro médico elegível, sem escolha manual.</li>
+                <li>Painel público mostra senha e sala, nunca nome ou CPF.</li>
+              </ul>
+              <ul class="projeto-tags"><li>Reflex</li><li>Xano</li><li>OpenSpec</li></ul>
+              <a href="https://github.com/leonardo-sferreira/ps-fila-prioritaria" target="_blank" rel="noopener" class="projeto-link">Ver repositório →</a>
+            </div>
+          </div>
+        </article>
 
-      <a href="https://github.com/leonardo-sferreira/conectahr" target="_blank" rel="noopener"
-         class="projeto-card reveal" data-accent="mustard" style="--delay:0.12s">
-        <div class="projeto-thumb">
-          <span class="projeto-status">Em desenvolvimento</span>
-          <img src="assets/projetos/conectarh-inicio.png" alt="Tela inicial do ConectaRH, plataforma de gestão de pessoas">
-        </div>
-        <div class="projeto-body">
-          <span class="projeto-num">02</span>
+        <article class="traj-case reveal" id="proj-02" data-accent="mustard">
+          <span class="traj-eyebrow">Em desenvolvimento · Projeto acadêmico</span>
           <h3>ConectaRH</h3>
-          <p>Plataforma que centraliza o ciclo de vida do colaborador — ponto, férias, documentos e desligamento — com quatro perfis de acesso e auditoria de cada decisão.</p>
-          <ul class="projeto-tags">
-            <li>Streamlit</li><li>Xano</li><li>Supabase</li>
-          </ul>
-          <span class="projeto-link">Ver repositório →</span>
-        </div>
-      </a>
+          <div class="traj-body">
+            <div class="traj-media"><img src="assets/projetos/conectarh-inicio.png" alt="Tela inicial do ConectaRH, plataforma de gestão de pessoas"></div>
+            <div class="traj-text">
+              <ul class="traj-bullets">
+                <li>Centraliza ponto, férias, documentos e desligamento num só lugar, com quatro perfis de acesso.</li>
+                <li>Motor de regras trabalhistas aplica a matriz certa por tipo de contrato (CLT, estágio, PJ...).</li>
+                <li>Toda decisão relevante fica auditada: quem fez, o quê, quando e por quê.</li>
+              </ul>
+              <ul class="projeto-tags"><li>Streamlit</li><li>Xano</li><li>Supabase</li></ul>
+              <a href="https://github.com/leonardo-sferreira/conectahr" target="_blank" rel="noopener" class="projeto-link">Ver repositório →</a>
+            </div>
+          </div>
+        </article>
 
-      <a href="https://www.figma.com/design/iRn8igu0iCwyqYTathrz9P/Sabor-local?node-id=0-1" target="_blank" rel="noopener"
-         class="projeto-card reveal" data-accent="terracotta" style="--delay:0.19s">
-        <div class="projeto-thumb">
-          <span class="projeto-status">Protótipo</span>
-          <img src="assets/projetos/sabor-local-home.png" alt="Tela inicial do app de delivery Sabor Local, com cardápio e categorias">
-        </div>
-        <div class="projeto-body">
-          <span class="projeto-num">03</span>
+        <article class="traj-case reveal" id="proj-03" data-accent="terracotta">
+          <span class="traj-eyebrow">Protótipo · Projeto acadêmico</span>
           <h3>Sabor Local</h3>
-          <p>Protótipo de app de delivery focado em culinária mineira — login, cardápio por categoria, carrinho, pagamento e acompanhamento do pedido.</p>
-          <ul class="projeto-tags">
-            <li>Figma</li><li>FlutterFlow</li><li>UX/UI</li>
-          </ul>
-          <span class="projeto-link">Ver protótipo →</span>
-        </div>
-      </a>
+          <div class="traj-body">
+            <div class="traj-media"><img src="assets/projetos/sabor-local-home.png" alt="Tela inicial do app de delivery Sabor Local, com cardápio e categorias"></div>
+            <div class="traj-text">
+              <ul class="traj-bullets">
+                <li>Login, cardápio por categoria, carrinho e pagamento pensados pra experiência tipo iFood.</li>
+                <li>Acompanhamento do pedido com mapa em tempo real.</li>
+                <li>Protótipo navegável completo no Figma, telas organizadas por fluxo.</li>
+              </ul>
+              <ul class="projeto-tags"><li>Figma</li><li>FlutterFlow</li><li>UX/UI</li></ul>
+              <a href="https://www.figma.com/design/iRn8igu0iCwyqYTathrz9P/Sabor-local?node-id=0-1" target="_blank" rel="noopener" class="projeto-link">Ver protótipo →</a>
+            </div>
+          </div>
+        </article>
 
-      <div class="projeto-card projeto-card--static reveal" data-accent="amber" style="--delay:0.26s">
-        <div class="projeto-thumb projeto-thumb--diagram">
-          <span class="projeto-status">Repositório privado</span>
-          <svg class="diagram-icon is-accent" viewBox="0 0 48 48" fill="none">
-            <circle cx="24" cy="24" r="20" stroke="currentColor" stroke-width="2.5"/>
-            <path d="M33 15L13.5 23.3c-1 .4-1 1 0 1.4l5.3 1.8 2 6c.3.9 1 1 1.4.2l2.6-4.6M33 15L19.8 26.5M33 15l-4 15.5c-.2.9-.9 1-1.4.3l-4-5.3"
-                  stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>
-          </svg>
-          <svg class="diagram-arrow" viewBox="0 0 48 14" fill="none">
-            <path d="M0 7h42M34 1l7 6-7 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          <svg class="diagram-icon" viewBox="0 0 48 48" fill="none">
-            <rect x="8" y="6" width="32" height="36" rx="4" stroke="currentColor" stroke-width="2.5"/>
-            <path d="M8 18h32M20 18v24" stroke="currentColor" stroke-width="2.5"/>
-            <circle cx="14" cy="12" r="1.6" fill="currentColor"/>
-          </svg>
-        </div>
-        <div class="projeto-body">
-          <span class="projeto-num">04</span>
+        <article class="traj-case reveal" id="proj-04" data-accent="amber">
+          <span class="traj-eyebrow">Em uso pessoal · Repositório privado</span>
           <h3>Bot de Finanças</h3>
-          <p>Bot de Telegram que registra gastos, recebimentos, faturas, investimentos e empréstimos direto num dashboard de finanças pessoais no Notion — com rotina diária automática de avisos e fechamento do mês.</p>
-          <ul class="projeto-tags">
-            <li>Python</li><li>Telegram Bot API</li><li>Notion API</li>
-          </ul>
-          <span class="projeto-link">Código fonte privado</span>
-        </div>
-      </div>
+          <div class="traj-body">
+            <div class="traj-media traj-media--diagram">
+              <svg class="diagram-icon is-accent" viewBox="0 0 48 48" fill="none">
+                <circle cx="24" cy="24" r="20" stroke="currentColor" stroke-width="2.5"/>
+                <path d="M33 15L13.5 23.3c-1 .4-1 1 0 1.4l5.3 1.8 2 6c.3.9 1 1 1.4.2l2.6-4.6M33 15L19.8 26.5M33 15l-4 15.5c-.2.9-.9 1-1.4.3l-4-5.3"
+                      stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>
+              </svg>
+              <svg class="diagram-arrow" viewBox="0 0 48 14" fill="none">
+                <path d="M0 7h42M34 1l7 6-7 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <svg class="diagram-icon" viewBox="0 0 48 48" fill="none">
+                <rect x="8" y="6" width="32" height="36" rx="4" stroke="currentColor" stroke-width="2.5"/>
+                <path d="M8 18h32M20 18v24" stroke="currentColor" stroke-width="2.5"/>
+                <circle cx="14" cy="12" r="1.6" fill="currentColor"/>
+              </svg>
+            </div>
+            <div class="traj-text">
+              <ul class="traj-bullets">
+                <li>Registra gasto, recebimento, fatura, investimento e empréstimo direto pelo Telegram.</li>
+                <li>Lança recorrentes sozinho e avisa fatura e parcela que vence em 3 dias.</li>
+                <li>Fecha o mês automaticamente: entradas, saídas, resultado e orçamento estourado.</li>
+              </ul>
+              <ul class="projeto-tags"><li>Python</li><li>Telegram Bot API</li><li>Notion API</li></ul>
+              <span class="projeto-link projeto-link--static">Código fonte privado</span>
+            </div>
+          </div>
+        </article>
 
+      </div>
     </div>
   </section>
 

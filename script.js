@@ -46,6 +46,27 @@ if (window.matchMedia("(pointer: fine)").matches && cursorDot) {
   });
 }
 
+/* ---------- TRAJETÓRIA: SCROLL-SPY ---------- */
+const trajCases = document.querySelectorAll(".traj-case");
+const trajNavItems = document.querySelectorAll(".trajetoria-list li");
+
+if (trajCases.length && trajNavItems.length) {
+  const trajObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const id = entry.target.id;
+          trajNavItems.forEach((li) => {
+            li.classList.toggle("active", li.dataset.target === id);
+          });
+        }
+      });
+    },
+    { rootMargin: "-40% 0px -50% 0px", threshold: 0 }
+  );
+  trajCases.forEach((el) => trajObserver.observe(el));
+}
+
 /* ---------- SERVIÇOS SWITCHER ---------- */
 const switcher = document.querySelector(".servicos-switcher");
 
