@@ -23,27 +23,132 @@ const revealObserver = new IntersectionObserver(
 );
 revealEls.forEach((el) => revealObserver.observe(el));
 
-/* ---------- CURSOR DOT ---------- */
-const cursorDot = document.getElementById("cursorDot");
-if (window.matchMedia("(pointer: fine)").matches && cursorDot) {
-  window.addEventListener("mousemove", (e) => {
-    cursorDot.style.left = e.clientX + "px";
-    cursorDot.style.top = e.clientY + "px";
+/* ---------- HERO: PAPEL GIRATÓRIO ---------- */
+const roleTextEl = document.getElementById("roleText");
+
+if (roleTextEl) {
+  const roles = ["Desenvolvedor Web", "Desenvolvedor Mobile", "Automações", "Banco de Dados"];
+  let roleIndex = 0;
+
+  setInterval(() => {
+    roleTextEl.classList.add("swap");
+    setTimeout(() => {
+      roleIndex = (roleIndex + 1) % roles.length;
+      roleTextEl.textContent = roles[roleIndex];
+      roleTextEl.classList.remove("swap");
+    }, 250);
+  }, 2400);
+}
+
+/* ---------- HERO: REDE DE PARTÍCULAS ---------- */
+const heroCanvas = document.getElementById("heroCanvas");
+
+if (heroCanvas && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+  const ctx = heroCanvas.getContext("2d");
+  const heroSection = heroCanvas.closest(".hero");
+  let particles = [];
+  let w = 0, h = 0, dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+  const COLORS = ["229,122,80", "95,160,146"];
+  const LINK_DIST = 140;
+  const MOUSE_DIST = 160;
+
+  const mouse = { x: null, y: null };
+
+  function countFor(width, height) {
+    const area = width * height;
+    return Math.min(110, Math.max(40, Math.round(area / 16000)));
+  }
+
+  function resize() {
+    w = heroSection.offsetWidth;
+    h = heroSection.offsetHeight;
+    heroCanvas.width = w * dpr;
+    heroCanvas.height = h * dpr;
+    heroCanvas.style.width = w + "px";
+    heroCanvas.style.height = h + "px";
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    const target = countFor(w, h);
+    if (particles.length === 0) {
+      particles = Array.from({ length: target }, () => spawn());
+    } else if (particles.length < target) {
+      particles.push(...Array.from({ length: target - particles.length }, () => spawn()));
+    } else {
+      particles.length = target;
+    }
+  }
+
+  function spawn() {
+    return {
+      x: Math.random() * w,
+      y: Math.random() * h,
+      vx: (Math.random() - 0.5) * 0.25,
+      vy: (Math.random() - 0.5) * 0.25,
+      r: Math.random() * 1.4 + 0.6,
+      c: COLORS[Math.random() < 0.5 ? 0 : 1],
+    };
+  }
+
+  function step() {
+    ctx.clearRect(0, 0, w, h);
+
+    for (const p of particles) {
+      p.x += p.vx;
+      p.y += p.vy;
+      if (p.x < 0 || p.x > w) p.vx *= -1;
+      if (p.y < 0 || p.y > h) p.vy *= -1;
+
+      if (mouse.x !== null) {
+        const dx = p.x - mouse.x, dy = p.y - mouse.y;
+        const d = Math.hypot(dx, dy);
+        if (d < MOUSE_DIST) {
+          const force = (MOUSE_DIST - d) / MOUSE_DIST * 0.03;
+          p.vx += (dx / d) * force;
+          p.vy += (dy / d) * force;
+        }
+      }
+      p.vx *= 0.995;
+      p.vy *= 0.995;
+
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${p.c},0.8)`;
+      ctx.fill();
+    }
+
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const a = particles[i], b = particles[j];
+        const dx = a.x - b.x, dy = a.y - b.y;
+        const d = Math.hypot(dx, dy);
+        if (d < LINK_DIST) {
+          ctx.beginPath();
+          ctx.moveTo(a.x, a.y);
+          ctx.lineTo(b.x, b.y);
+          ctx.strokeStyle = `rgba(229,122,80,${0.14 * (1 - d / LINK_DIST)})`;
+          ctx.lineWidth = 1;
+          ctx.stroke();
+        }
+      }
+    }
+
+    requestAnimationFrame(step);
+  }
+
+  heroSection.addEventListener("mousemove", (e) => {
+    const rect = heroSection.getBoundingClientRect();
+    mouse.x = e.clientX - rect.left;
+    mouse.y = e.clientY - rect.top;
   });
-  document.querySelectorAll("a, button").forEach((el) => {
-    el.addEventListener("mouseenter", () => {
-      cursorDot.style.width = "24px";
-      cursorDot.style.height = "24px";
-      cursorDot.style.background = "transparent";
-      cursorDot.style.border = "1.5px solid var(--accent-light)";
-    });
-    el.addEventListener("mouseleave", () => {
-      cursorDot.style.width = "10px";
-      cursorDot.style.height = "10px";
-      cursorDot.style.background = "var(--accent-light)";
-      cursorDot.style.border = "none";
-    });
+  heroSection.addEventListener("mouseleave", () => {
+    mouse.x = null;
+    mouse.y = null;
   });
+
+  window.addEventListener("resize", resize);
+  resize();
+  requestAnimationFrame(step);
 }
 
 /* ---------- TRAJETÓRIA: SCROLL-SPY ---------- */

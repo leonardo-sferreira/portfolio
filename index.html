@@ -11,9 +11,6 @@
 </head>
 <body>
 
-  <!-- CURSOR -->
-  <div class="cursor-dot" id="cursorDot"></div>
-
   <!-- PRE-LOADER -->
   <div id="preloader">
     <div class="loader-content">
@@ -38,10 +35,13 @@
 
   <!-- HERO -->
   <section class="hero" id="topo">
+    <canvas class="hero-canvas" id="heroCanvas"></canvas>
     <div class="hero-content">
       <p class="hero-sub reveal">Olá, eu sou</p>
-      <h1 class="reveal" style="--delay:0.08s">Leonardo Ferreira</h1>
-      <p class="hero-role reveal" style="--delay:0.16s">Desenvolvedor de Software</p>
+      <h1 class="reveal" style="--delay:0.08s">Leonardo.</h1>
+      <p class="hero-role reveal" style="--delay:0.16s">
+        <span class="role-pill"><span class="role-dot"></span><span id="roleText">Desenvolvedor Web</span></span>
+      </p>
       <a href="#contato" class="btn-primary reveal" style="--delay:0.24s">Fale comigo</a>
     </div>
     <div class="hero-scroll">
