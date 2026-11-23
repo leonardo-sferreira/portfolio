@@ -1,9 +1,32 @@
 /* Leonardo Arena · portfólio jogável
    Bloco 1: mundo voxel, movimento, colisão e câmera.
    Bloco 2: criação de personagem.
-   Bloco 3: luta (soco, chute, impacto, boneco de treino). */
+   Bloco 3: luta (soco, chute, impacto, boneco de treino).
+   Bloco 4: portfólio no mapa (dojos, Sobre mim, portal de contato).
+   Bloco 5: missões, progresso e controles de toque.
+   Bloco 6: desempenho adaptativo e plano B sem 3D. */
 (() => {
   "use strict";
+
+  const CLASSIC_URL = "https://leonardo-sferreira.github.io/portfolio/classico.html";
+
+  /* Plano B: sem WebGL ou sem a biblioteca 3D, vai para a versão clássica. */
+  function webglOK() {
+    try {
+      const c = document.createElement("canvas");
+      return !!(window.WebGLRenderingContext && (c.getContext("webgl") || c.getContext("experimental-webgl")));
+    } catch (e) {
+      return false;
+    }
+  }
+  if (!window.THREE || !webglOK()) {
+    window.location.replace(CLASSIC_URL);
+    return;
+  }
+
+  /* O jogo roda na raiz do site (index.html) e também em /jogo/ durante testes. */
+  const ASSET_BASE = /\/jogo\/?(index\.html)?$/.test(window.location.pathname) ? "../assets/" : "assets/";
+  const isTouch = window.matchMedia("(pointer: coarse)").matches;
 
   const $ = (id) => document.getElementById(id);
   const V3 = THREE.Vector3;
@@ -99,7 +122,8 @@
      ========================================================= */
   const canvas = $("game");
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  let pixelRatio = Math.min(window.devicePixelRatio || 1, isTouch ? 1.5 : 2);
+  renderer.setPixelRatio(pixelRatio);
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -120,7 +144,7 @@
   scene.add(new THREE.HemisphereLight(0xeaf7ff, 0x4a6b45, 0.7));
   const sun = new THREE.DirectionalLight(0xfff1d6, 0.8);
   sun.castShadow = true;
-  sun.shadow.mapSize.set(2048, 2048);
+  sun.shadow.mapSize.set(isTouch ? 1024 : 2048, isTouch ? 1024 : 2048);
   const sc = sun.shadow.camera;
   sc.left = -22; sc.right = 22; sc.top = 22; sc.bottom = -22; sc.near = 1; sc.far = 80;
   sun.shadow.bias = -0.0006;
@@ -722,6 +746,7 @@
   let jumpQueued = false;
   let attackQueued = null;
   let mode = "creator"; // "creator" | "play" | "panel"
+  const joy = { x: 0, y: 0 };
 
   window.addEventListener("keydown", (e) => {
     if (e.target && e.target.tagName === "INPUT") return;
@@ -855,11 +880,14 @@
 
   function updatePlayer(dt) {
     tmp.set(0, 0, 0);
+    let joyRun = false;
     if (mode === "play") {
       if (held("up")) tmp.z -= 1;
       if (held("down")) tmp.z += 1;
       if (held("left")) tmp.x -= 1;
       if (held("right")) tmp.x += 1;
+      const jm = Math.hypot(joy.x, joy.y);
+      if (jm > 0.15) { tmp.x += joy.x; tmp.z += joy.y; joyRun = jm > 0.9; }
     }
     if (tmp.lengthSq() > 0) tmp.normalize();
 
@@ -867,7 +895,7 @@
     attackQueued = null;
 
     const attacking = !!player.attack;
-    const speed = (held("run") ? SPEED.run : SPEED.walk) * (attacking && player.onGround ? 0.25 : 1);
+    const speed = (held("run") || joyRun ? SPEED.run : SPEED.walk) * (attacking && player.onGround ? 0.25 : 1);
     const accel = player.onGround ? 14 : 5;
     player.vel.x = lerp(player.vel.x, tmp.x * speed, damp(accel, dt));
     player.vel.z = lerp(player.vel.z, tmp.z * speed, damp(accel, dt));
@@ -1106,6 +1134,7 @@
     player.attack = null;
     creatorEl.classList.remove("hidden");
     $("hud").classList.add("hidden");
+    $("touch").classList.add("hidden");
     nameInput.value = player.look.name || "";
   }
   function startGame() {
@@ -1115,10 +1144,12 @@
     player.yaw = 0;
     creatorEl.classList.add("hidden");
     $("hud").classList.remove("hidden");
+    if (isTouch) $("touch").classList.remove("hidden");
+    renderQuests();
     updateName();
     if (document.activeElement) document.activeElement.blur();
     if (!store.get("arenaHelloSeen")) {
-      toast("Vá até o TREINO e use J e K no boneco!", 3200);
+      toast(isTouch ? "Vá até o TREINO e use os botões Soco e Chute no boneco!" : "Vá até o TREINO e use o clique (ou J e K) no boneco!", 3600);
       store.set("arenaHelloSeen", true);
     }
   }
@@ -1134,8 +1165,8 @@
     email: "mailto:leonardoferreira0409@gmail.com",
     linkedin: "https://www.linkedin.com/in/ferreirasantosleonardo",
     github: "https://github.com/leonardo-sferreira",
-    cv: "../assets/CV-Leonardo-dos-Santos.pdf",
-    classic: "https://leonardo-sferreira.github.io/portfolio/",
+    cv: ASSET_BASE + "CV-Leonardo-dos-Santos.pdf",
+    classic: CLASSIC_URL,
   };
 
   const PROJECTS = {
@@ -1238,8 +1269,9 @@
   function loadPanelImages() {
     for (const img of panelBody.querySelectorAll("img[data-file]")) {
       const file = img.dataset.file;
-      img.onerror = () => { img.onerror = () => img.remove(); img.src = "assets/projetos/" + file; };
-      img.src = "../assets/projetos/" + file;
+      const other = ASSET_BASE === "assets/" ? "../assets/" : "assets/";
+      img.onerror = () => { img.onerror = () => img.remove(); img.src = other + "projetos/" + file; };
+      img.src = ASSET_BASE + "projetos/" + file;
     }
   }
 
@@ -1252,7 +1284,9 @@
   }
 
   let lastFocus = null;
+  let panelOpenedAt = 0;
   function openPanel(id) {
+    panelOpenedAt = performance.now();
     const html = PROJECTS[id] ? projectHtml(PROJECTS[id]) : id === "sobre" ? SOBRE_HTML : CONTATO_HTML;
     panelBody.innerHTML = html;
     loadPanelImages();
@@ -1261,6 +1295,8 @@
     player.attack = null;
     buffered = null;
     panelEl.classList.remove("hidden");
+    $("touch").classList.add("hidden");
+    resetJoy();
     lastFocus = document.activeElement;
     requestAnimationFrame(() => $("panelClose").focus());
     markVisited(id);
@@ -1268,10 +1304,15 @@
   function closePanel() {
     panelEl.classList.add("hidden");
     mode = "play";
+    if (isTouch) $("touch").classList.remove("hidden");
     if (lastFocus && lastFocus.focus) lastFocus.focus();
+    if (pendingCelebration) celebrate();
   }
   $("panelClose").addEventListener("click", closePanel);
-  panelEl.addEventListener("click", (e) => { if (e.target === panelEl) closePanel(); });
+  /* Clique fora fecha, mas não o "clique" que o próprio toque que abriu o painel gera logo em seguida. */
+  panelEl.addEventListener("click", (e) => {
+    if (e.target === panelEl && performance.now() - panelOpenedAt > 450) closePanel();
+  });
 
   /* ---------- construções ---------- */
   const glowMats = [];
@@ -1504,9 +1545,113 @@
     renderer.setSize(window.innerWidth, window.innerHeight);
   });
 
-  // HUD do estágio atual: missões e barra de progresso chegam no bloco 5
-  $("quests").classList.add("hidden");
-  document.querySelector(".hud-bar").classList.add("hidden");
+  /* =========================================================
+     MISSÕES E PROGRESSO (bloco 5)
+     ========================================================= */
+  const QUESTS = [
+    ["proj-01", "Abrir o PS Fila Prioritária"],
+    ["proj-02", "Abrir o ConectaRH"],
+    ["proj-03", "Abrir o Sabor Local"],
+    ["proj-04", "Abrir o Bot de Finanças"],
+    ["sobre", "Ler o Sobre mim"],
+    ["contato", "Atravessar o portal de contato"],
+  ];
+  let pendingCelebration = false;
+  function renderQuests() {
+    const done = QUESTS.filter(([id]) => visited.has(id)).length;
+    $("questList").innerHTML = QUESTS.map(([id, text]) => `<li class="${visited.has(id) ? "done" : ""}">${text}</li>`).join("");
+    $("questCount").textContent = `${done}/${QUESTS.length}`;
+    $("hudBar").style.width = `${(done / QUESTS.length) * 100}%`;
+  }
+  window.addEventListener("arena:visited", (e) => {
+    renderQuests();
+    const q = QUESTS.find(([id]) => id === e.detail);
+    if (!q) return;
+    if (QUESTS.every(([id]) => visited.has(id)) && !store.get("arenaDone")) pendingCelebration = true;
+  });
+  function celebrate() {
+    pendingCelebration = false;
+    store.set("arenaDone", true);
+    const at = player.pos.clone().add(new V3(0, 2.2, 0));
+    for (let i = 0; i < 3; i++) {
+      setTimeout(() => burst(at, ["#2dd4bf", "#f2c14e", "#ef4444", "#4f8ff0", "#ffffff"], 30, 8), i * 220);
+    }
+    floatText("PORTFÓLIO ZERADO!", at, "combo");
+    toast("🏆 Você zerou o portfólio! Obrigado por jogar. Bora conversar? O portal de contato está sempre aberto.", 6500);
+  }
+  renderQuests();
+
+  /* =========================================================
+     CONTROLES DE TOQUE (bloco 5)
+     ========================================================= */
+  const stick = $("stick");
+  const knob = $("stickKnob");
+  let stickId = null;
+  const STICK_R = 50;
+  function resetJoy() {
+    joy.x = 0; joy.y = 0; stickId = null;
+    knob.style.transform = "";
+  }
+  function moveStick(e) {
+    const r = stick.getBoundingClientRect();
+    let dx = e.clientX - (r.left + r.width / 2);
+    let dy = e.clientY - (r.top + r.height / 2);
+    const len = Math.hypot(dx, dy);
+    if (len > STICK_R) { dx = dx / len * STICK_R; dy = dy / len * STICK_R; }
+    joy.x = dx / STICK_R;
+    joy.y = dy / STICK_R;
+    knob.style.transform = `translate(${dx}px, ${dy}px)`;
+  }
+  stick.addEventListener("pointerdown", (e) => {
+    stickId = e.pointerId;
+    stick.setPointerCapture(e.pointerId);
+    moveStick(e);
+    e.preventDefault();
+  });
+  stick.addEventListener("pointermove", (e) => { if (e.pointerId === stickId) moveStick(e); });
+  stick.addEventListener("pointerup", resetJoy);
+  stick.addEventListener("pointercancel", resetJoy);
+  for (const btn of document.querySelectorAll("#touch [data-act]")) {
+    btn.addEventListener("pointerdown", (e) => {
+      e.preventDefault();
+      audio.init();
+      if (mode !== "play") return;
+      const act = btn.dataset.act;
+      if (act === "punch" || act === "kick") attackQueued = act;
+      else if (act === "jump") jumpQueued = true;
+      else if (act === "interact") interact();
+    });
+  }
+  if (isTouch) document.body.classList.add("touch");
+  // no celular a lista de missões começa recolhida e abre com um toque
+  $("quests").addEventListener("click", () => $("quests").classList.toggle("open"));
+
+  /* =========================================================
+     DESEMPENHO ADAPTATIVO (bloco 6)
+     ========================================================= */
+  const perf = { frames: 0, time: 0, stage: 0 };
+  function checkPerformance(realDt) {
+    if (mode !== "play" || perf.stage >= 2) return;
+    perf.frames++;
+    perf.time += realDt;
+    if (perf.time < 2.5) return;
+    const fps = perf.frames / perf.time;
+    perf.frames = 0;
+    perf.time = 0;
+    if (fps >= 40) { perf.stage = 2; return; }
+    if (perf.stage === 0 && pixelRatio > 1) {
+      pixelRatio = 1;                    // primeiro: menos pixels
+      renderer.setPixelRatio(1);
+      perf.stage = 1;
+    } else {
+      renderer.shadowMap.enabled = false; // depois: sem sombras
+      scene.traverse((o) => {
+        if (!o.material) return;
+        for (const m of [].concat(o.material)) m.needsUpdate = true;
+      });
+      perf.stage = 2;
+    }
+  }
 
   let last = performance.now();
   openCreator();
@@ -1514,8 +1659,10 @@
   updateCamera(0, true);
 
   function frame(now) {
-    let dt = Math.min((now - last) / 1000, 1 / 20);
+    const realDt = (now - last) / 1000;
+    let dt = Math.min(realDt, 1 / 20);
     last = now;
+    checkPerformance(realDt);
     if (hitStop > 0) { hitStop -= dt; dt *= 0.12; }
     updatePlayer(dt);
     updateSprings(dt);
@@ -1540,7 +1687,7 @@
   // ganchos para testes automatizados e para os próximos blocos
   window.__arena = {
     player, heightAt, groundUnder, colliders, ZONES, targets, dummy, setLook, hits,
-    totems, portal, sobre, visited, PROJECTS, openPanel, closePanel,
+    totems, portal, sobre, visited, PROJECTS, openPanel, closePanel, joy, perf, QUESTS,
     get mode() { return mode; }, get combo() { return combo; }, startGame, openCreator,
   };
 })();

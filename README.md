@@ -1,8 +1,11 @@
 # Portfólio — Leonardo dos Santos
 
-Site de portfólio pessoal, feito em HTML, CSS e JavaScript puro, sem framework e sem build.
+Portfólio pessoal em duas versões, as duas em HTML, CSS e JavaScript puro, sem build:
 
-**Site no ar:** <https://leonardo-sferreira.github.io/portfolio/>
+- **Portfólio jogável** (página inicial): crie seu lutador voxel, explore a ilha e abra os projetos nos dojos.
+- **Versão clássica** (`classico.html`): o mesmo conteúdo em página de leitura rápida.
+
+**Site no ar:** <https://leonardo-sferreira.github.io/portfolio/> · **Versão clássica:** <https://leonardo-sferreira.github.io/portfolio/classico.html>
 
 ## Projetos apresentados
 
@@ -13,42 +16,44 @@ Site de portfólio pessoal, feito em HTML, CSS e JavaScript puro, sem framework 
 | **Sabor Local** | Protótipo · acadêmico | Figma, FlutterFlow, UX/UI | [Protótipo no Figma](https://www.figma.com/design/iRn8igu0iCwyqYTathrz9P/Sabor-local?node-id=0-1) · [Telas](https://github.com/leonardo-sferreira/SaborLocal-Figma) |
 | **Bot de Finanças** | Em uso pessoal | Python, Telegram Bot API, Notion API | Repositório privado |
 
-Cada projeto tem um "case completo" no site, aberto num modal com galeria de telas, papel no time e números do projeto.
+## O jogo
 
-## Seções do site
+Feito com [Three.js](https://threejs.org) (r128, via CDN), sem modelos de terceiros: tudo é montado com cubos no código.
 
-- **Hero:** nome, proposta de valor, área em destaque girando (Web, Mobile, Automações, Banco de Dados) e rede de partículas que reage ao mouse.
-- **Números:** contadores animados.
-- **Sobre**
-- **Serviços:** rolagem fixa em quatro etapas (Web, Mobile, Automações, Banco de Dados), com anel de progresso e ícones desenhados.
-- **Trajetória:** os quatro projetos, com navegação lateral que acompanha a rolagem.
-- **Contato:** e-mail, LinkedIn e download do CV.
+| O que tem | Como funciona |
+| --- | --- |
+| **Criação de personagem** | Pele, cabelo, roupa, cores, faixa e nome; fica salvo no navegador (`C` reabre) |
+| **Movimento** | `WASD` ou setas, `Shift` corre, `Espaço` pula; no celular, joystick na tela |
+| **Luta** | Clique esquerdo ou `J` dá soco, clique direito ou `K` dá chute, com combo, partículas, tremor e som (`M` liga e desliga) |
+| **Boneco de treino** | Mostra os números dos projetos como "dano" |
+| **Dojos dos projetos** | Três golpes no totem (ou `E`) abrem o case com imagem, papel, números e links |
+| **Sobre mim e contato** | Pedra "Sobre mim" e portal de contato, que abre ao atravessar |
+| **Missões** | Seis missões e barra de progresso; zerar mostra uma comemoração |
+| **Acessibilidade e desempenho** | Versão clássica sempre a um clique; sem WebGL, redireciona para ela; reduz resolução e sombras sozinho em aparelhos lentos; respeita `prefers-reduced-motion` |
 
 ## Estrutura
 
 ```text
-index.html                     conteúdo e marcação de todas as seções
-style.css                      tema escuro, layout responsivo e animações
-script.js                      interações e dados dos cases (objeto PROJECTS)
+index.html                     portfólio jogável (página inicial)
+jogo/jogo.js                   mundo, personagem, luta, conteúdo, missões e controles
+jogo/jogo.css                  telas do jogo: criação, HUD, painéis e controles de toque
+classico.html                  versão clássica
+style.css · script.js          estilo e interações da versão clássica
 assets/CV-Leonardo-dos-Santos.pdf
-assets/projetos/               capturas de tela usadas nos cards e no modal
+assets/projetos/               capturas de tela usadas nas duas versões
 ```
 
-Para editar o texto de um case completo, altere o objeto `PROJECTS` em `script.js`. O card que aparece na página fica em `index.html`.
-
-## Interações
-
-Pre-loader com constelação, barra de progresso de rolagem, efeito glitch no menu, texto revelado palavra por palavra, imagens com revelação e inclinação 3D, botões magnéticos e modal acessível (foco preso, `Esc` para fechar, galeria que aceita arrastar). As animações pesadas são desligadas quando o sistema pede movimento reduzido (`prefers-reduced-motion`).
+Para editar o conteúdo de um projeto: no jogo, o objeto `PROJECTS` em `jogo/jogo.js`; na versão clássica, o objeto `PROJECTS` em `script.js` e o card em `classico.html`.
 
 ## Rodando localmente
 
-Abra `index.html` no navegador ou suba um servidor local:
+Suba um servidor local na pasta do projeto (o jogo carrega arquivos e não funciona abrindo o HTML direto):
 
 ```bash
 python -m http.server 8080
 ```
 
-e acesse `http://localhost:8080`.
+e acesse `http://localhost:8080` (jogo) ou `http://localhost:8080/classico.html`.
 
 ## Publicação
 

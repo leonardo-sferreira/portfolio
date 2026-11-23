@@ -134,6 +134,14 @@ h1, h2, h3 { font-family: var(--font-head); }
 .navbar nav a:hover { color: var(--text); }
 .navbar nav a:hover::after { width: 100%; }
 .navbar nav { align-items: center; }
+.navbar nav a.nav-game {
+  color: var(--accent);
+  border: 1px solid rgba(45,212,191,0.4);
+  border-radius: 999px;
+  padding: 4px 12px;
+}
+.navbar nav a.nav-game::after { display: none; }
+.navbar nav a.nav-game:hover { color: #06201c; background: var(--accent); }
 .navbar nav a.nav-github { display: inline-flex; }
 .navbar nav a.nav-github::after { display: none; }
 .navbar nav a.nav-github svg { width: 18px; height: 18px; }
