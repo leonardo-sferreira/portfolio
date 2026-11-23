@@ -437,8 +437,9 @@ const PROJECTS = {
     desc: [
       "O desafio era substituir a fila por ordem de chegada de um pronto-socorro por uma fila que prioriza de verdade quem está pior — sem perder transparência para quem está esperando.",
       "O sistema cuida da triagem (sintomas e sinais vitais viram uma classificação de risco), direciona cada ficha para a especialidade certa e mostra as chamadas num painel público que nunca expõe nome ou CPF.",
+      "Projeto finalizado: todas as funcionalidades planejadas foram entregues, testadas no sistema integrado e validadas por mim como PO. O sistema ganhou o nome de Prioriza e tem manual do usuário e documentação técnica publicados.",
     ],
-    tech: "Por trás da tela: front-end em Reflex, back-end em Xano com 19 tabelas já publicadas, e a primeira fatia (cadastro de pacientes e ficha de atendimento) já em produção.",
+    tech: "Por trás da tela: front-end em Reflex com 33 telas, back-end em Xano com 23 tabelas e 71 endpoints, 127 requisitos especificados no OpenSpec e 486 testes catalogados.",
     images: [
       { src: "assets/projetos/ps-fila-totem.png", alt: "Totem de autoatendimento do pronto-socorro" },
       { src: "assets/projetos/ps-fila-painel.png", alt: "Painel público de chamadas" },
