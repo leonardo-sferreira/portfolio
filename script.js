@@ -1,3 +1,11 @@
+/* Abrir sempre no início: sem isso o navegador devolve a pessoa ao ponto onde parou
+   (por exemplo, em Serviços) ao recarregar ou reabrir a aba. Links com âncora (#projetos) continuam valendo. */
+if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+if (!location.hash) window.scrollTo(0, 0);
+window.addEventListener("pageshow", () => {
+  if (!location.hash) window.scrollTo(0, 0);
+});
+
 document.getElementById("ano").textContent = new Date().getFullYear();
 
 /* ---------- BARRA DE PROGRESSO ---------- */
@@ -515,24 +523,70 @@ if (modalOverlay) {
   let lastFocused = null;
   const modalEl = document.querySelector(".modal");
 
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const SLIDE_MS = 320;
+  const SLIDE_EASE = "cubic-bezier(.22,1,.36,1)";
+  let sliding = false;
+
+  function updateDots() {
+    galDots.querySelectorAll("span").forEach((dot, i) => dot.classList.toggle("active", i === galIndex));
+  }
+
   function renderGallery() {
     if (!galImages.length) {
       modalGallery.style.display = "none";
       return;
     }
     modalGallery.style.display = "flex";
+    modalImg.style.transition = "none";
+    modalImg.style.transform = "";
+    modalImg.style.opacity = "";
     modalImg.src = galImages[galIndex].src;
     modalImg.alt = galImages[galIndex].alt;
     galDots.innerHTML = "";
     galImages.forEach((_, i) => {
       const dot = document.createElement("span");
-      if (i === galIndex) dot.classList.add("active");
-      dot.addEventListener("click", () => { galIndex = i; renderGallery(); });
+      dot.addEventListener("click", () => goTo(i, i > galIndex ? 1 : -1));
       galDots.appendChild(dot);
     });
+    updateDots();
+    galImages.forEach((img) => { new Image().src = img.src; }); // pré-carrega para a troca não piscar
     const showNav = galImages.length > 1;
     document.getElementById("galPrev").style.display = showNav ? "block" : "none";
     document.getElementById("galNext").style.display = showNav ? "block" : "none";
+  }
+
+  /* troca de foto deslizando: a atual sai para um lado e a próxima entra pelo outro */
+  function goTo(index, dir) {
+    const next = (index + galImages.length) % galImages.length;
+    if (sliding || next === galIndex || galImages.length < 2) return;
+    galIndex = next;
+    updateDots();
+
+    if (reduceMotion) {
+      modalImg.src = galImages[galIndex].src;
+      modalImg.alt = galImages[galIndex].alt;
+      modalImg.style.transform = "";
+      return;
+    }
+
+    sliding = true;
+    const width = modalGallery.offsetWidth;
+    modalImg.style.transition = `transform ${SLIDE_MS * 0.7}ms ease-in, opacity ${SLIDE_MS * 0.7}ms ease-in`;
+    modalImg.style.transform = `translateX(${-dir * width * 0.35}px)`;
+    modalImg.style.opacity = "0";
+
+    setTimeout(() => {
+      modalImg.style.transition = "none";
+      modalImg.src = galImages[galIndex].src;
+      modalImg.alt = galImages[galIndex].alt;
+      modalImg.style.transform = `translateX(${dir * width * 0.35}px)`;
+      void modalImg.offsetWidth;
+      modalImg.style.transition = `transform ${SLIDE_MS}ms ${SLIDE_EASE}, opacity ${SLIDE_MS}ms ease`;
+      modalImg.style.transform = "translateX(0)";
+      modalImg.style.opacity = "1";
+      setTimeout(() => { sliding = false; }, SLIDE_MS);
+    }, SLIDE_MS * 0.7);
   }
 
   function openModal(id) {
@@ -610,42 +664,54 @@ if (modalOverlay) {
     if (e.target === modalOverlay) closeModal();
   });
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && modalOverlay.classList.contains("open")) closeModal();
+    if (!modalOverlay.classList.contains("open")) return;
+    if (e.key === "Escape") closeModal();
+    else if (e.key === "ArrowLeft") goTo(galIndex - 1, -1);
+    else if (e.key === "ArrowRight") goTo(galIndex + 1, 1);
   });
-  document.getElementById("galPrev").addEventListener("click", () => {
-    galIndex = (galIndex - 1 + galImages.length) % galImages.length;
-    renderGallery();
-  });
-  document.getElementById("galNext").addEventListener("click", () => {
-    galIndex = (galIndex + 1) % galImages.length;
-    renderGallery();
-  });
+  document.getElementById("galPrev").addEventListener("click", () => goTo(galIndex - 1, -1));
+  document.getElementById("galNext").addEventListener("click", () => goTo(galIndex + 1, 1));
 
-  /* arrastar/deslizar a galeria */
+  /* arrastar/deslizar a galeria: a foto acompanha o ponteiro e, ao soltar, troca ou volta */
+  const DRAG_THRESHOLD = 60;
   let dragStartX = null;
+  let dragDelta = 0;
+
+  function endDrag(commit) {
+    if (dragStartX === null) return;
+    modalGallery.classList.remove("dragging");
+    const delta = dragDelta;
+    dragStartX = null;
+    dragDelta = 0;
+
+    if (commit && Math.abs(delta) > DRAG_THRESHOLD) {
+      goTo(galIndex + (delta < 0 ? 1 : -1), delta < 0 ? 1 : -1);
+    } else {
+      modalImg.style.transition = `transform ${SLIDE_MS}ms ${SLIDE_EASE}, opacity ${SLIDE_MS}ms ease`;
+      modalImg.style.transform = "translateX(0)";
+      modalImg.style.opacity = "1";
+    }
+  }
+
   modalGallery.addEventListener("pointerdown", (e) => {
-    if (galImages.length < 2) return;
+    // setas e bolinhas têm o próprio clique; capturar o ponteiro aqui roubaria esse clique
+    if (galImages.length < 2 || sliding || e.target.closest(".modal-nav, .modal-dots")) return;
+    if (e.pointerType === "mouse" && e.button !== 0) return;
     dragStartX = e.clientX;
+    dragDelta = 0;
     modalGallery.setPointerCapture(e.pointerId);
     modalGallery.classList.add("dragging");
+    modalImg.style.transition = "none";
   });
-  modalGallery.addEventListener("pointerup", (e) => {
+  modalGallery.addEventListener("pointermove", (e) => {
     if (dragStartX === null) return;
-    const delta = e.clientX - dragStartX;
-    if (delta > 40) {
-      galIndex = (galIndex - 1 + galImages.length) % galImages.length;
-      renderGallery();
-    } else if (delta < -40) {
-      galIndex = (galIndex + 1) % galImages.length;
-      renderGallery();
-    }
-    dragStartX = null;
-    modalGallery.classList.remove("dragging");
+    dragDelta = e.clientX - dragStartX;
+    const width = modalGallery.offsetWidth || 1;
+    modalImg.style.transform = `translateX(${dragDelta}px)`;
+    modalImg.style.opacity = String(1 - Math.min(0.5, Math.abs(dragDelta) / width));
   });
-  modalGallery.addEventListener("pointercancel", () => {
-    dragStartX = null;
-    modalGallery.classList.remove("dragging");
-  });
+  modalGallery.addEventListener("pointerup", () => endDrag(true));
+  modalGallery.addEventListener("pointercancel", () => endDrag(false));
 }
 
 /* ---------- SERVIÇOS: SCROLL PINADO ---------- */
