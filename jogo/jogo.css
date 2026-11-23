@@ -103,7 +103,15 @@ a { color: inherit; }
 .hud-name { font-family: var(--pixel); font-size: 11px; color: #fff; }
 .hud-bar { height: 10px; margin: 8px 0 6px; background: #3b0d0d; border-radius: 3px; overflow: hidden; border: 1px solid rgba(255,255,255,0.15); }
 .hud-bar i { display: block; height: 100%; width: 0%; background: linear-gradient(90deg, var(--gold), var(--accent)); transition: width 0.4s ease; }
-.hud-sub { font-size: 11px; color: var(--muted); }
+.hud-sub { display: block; font-size: 11px; color: var(--muted); margin-top: 6px; }
+.hud-edit {
+  pointer-events: auto; display: inline-flex; align-items: center; gap: 6px;
+  margin-top: 10px; padding: 6px 10px; border-radius: 8px; cursor: pointer;
+  background: rgba(255,255,255,0.06); border: 1px solid var(--line); color: var(--text);
+  font: 600 12px var(--body);
+}
+.hud-edit:hover { border-color: var(--accent); color: var(--accent); }
+.hud-edit kbd { margin: 0; }
 
 .hud-quests {
   position: absolute; top: 16px; right: 16px; width: 240px;
@@ -153,7 +161,9 @@ kbd {
   text-shadow: 2px 2px 0 #000, -1px -1px 0 #000;
 }
 .floater.big { font-size: 16px; color: #fff; }
-.floater.label { font-size: 10px; color: #fff; background: rgba(0,0,0,0.55); padding: 5px 8px; border-radius: 6px; text-shadow: none; }
+.floater.label { font-size: 9px; color: #fff; background: rgba(0,0,0,0.55); padding: 6px 8px; border-radius: 6px; text-shadow: none; }
+.floater.label.name { font-size: 8px; color: var(--gold); background: rgba(0,0,0,0.45); }
+.floater.combo { font-size: 15px; color: #ef4444; text-shadow: 2px 2px 0 #fff, -1px -1px 0 #000; }
 
 /* ---------- controles de toque ---------- */
 #touch { position: fixed; inset: 0; z-index: 12; pointer-events: none; }

@@ -1,5 +1,7 @@
 /* Leonardo Arena · portfólio jogável
-   Bloco 1: mundo voxel, lutador, movimento, colisão e câmera. */
+   Bloco 1: mundo voxel, movimento, colisão e câmera.
+   Bloco 2: criação de personagem.
+   Bloco 3: luta (soco, chute, impacto, boneco de treino). */
 (() => {
   "use strict";
 
@@ -8,15 +10,17 @@
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
   const lerp = (a, b, t) => a + (b - a) * t;
   const damp = (rate, dt) => 1 - Math.exp(-rate * dt);
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const store = {
+    get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
+  };
 
   /* =========================================================
      CONFIGURAÇÃO
      ========================================================= */
-  const WORLD = {
-    R: 30,            // raio médio da ilha, em blocos
-    waterY: 0.55,     // altura da superfície da água
-    seed: 7,
-  };
+  const WORLD = { R: 30, waterY: 0.55, seed: 7 };
 
   const COLORS = {
     sky: 0x8fd3f4,
@@ -33,7 +37,7 @@
     cloud: 0xffffff,
   };
 
-  /* Áreas reservadas para o conteúdo (blocos 3 e 4). Ficam planas e de pedra. */
+  /* Áreas do conteúdo. O treino já é usado no bloco 3; as outras entram no bloco 4. */
   const ZONES = [
     { id: "spawn", x: 0, z: 0, half: 3, accent: "#2dd4bf" },
     { id: "proj-01", x: 0, z: -17, half: 3, accent: "#ef4444" },
@@ -43,6 +47,27 @@
     { id: "sobre", x: -9, z: 9, half: 2, accent: "#a78bfa" },
     { id: "treino", x: 9, z: -9, half: 2, accent: "#f97316" },
     { id: "contato", x: -10, z: -10, half: 2, accent: "#2dd4bf" },
+  ];
+  const zoneById = (id) => ZONES.find((z) => z.id === id);
+
+  /* Opções da criação de personagem. */
+  const OPTIONS = {
+    skin: ["#f1c27d", "#d9a066", "#b07845", "#7a4a2a", "#4b2e1d"],
+    hair: [["curto", "Curto"], ["moicano", "Moicano"], ["espetado", "Espetado"], ["careca", "Careca"]],
+    hairColor: ["#1f1f1f", "#5b3a1e", "#c98d3a", "#e5e7eb", "#2dd4bf", "#ef4444"],
+    outfit: [["kimono", "Kimono"], ["regata", "Regata"], ["jaqueta", "Jaqueta"]],
+    outfitColor: ["#f5f5f5", "#1f2937", "#dc2626", "#2563eb", "#2dd4bf", "#f59e0b", "#7c3aed"],
+    band: ["none", "#ef4444", "#f2c14e", "#2dd4bf", "#4f8ff0", "#111827"],
+  };
+  const DEFAULT_LOOK = {
+    skin: "#d9a066", hair: "curto", hairColor: "#1f1f1f",
+    outfit: "kimono", outfitColor: "#f5f5f5", band: "#ef4444", name: "",
+  };
+
+  /* Os números do portfólio viram "dano" no boneco de treino. */
+  const DAMAGE = [
+    "387 endpoints!", "486 testes!", "88 telas!", "103 tabelas!",
+    "2 sistemas no ar!", "52 checks de CI!", "127 requisitos!", "40 entregas!",
   ];
 
   /* =========================================================
@@ -67,6 +92,7 @@
     return rngState / 4294967296;
   }
   const pick = (arr) => arr[Math.floor(rand() * arr.length)];
+  const pickAny = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
   /* =========================================================
      RENDER, CENA, CÂMERA, LUZ
@@ -86,9 +112,10 @@
   scene.fog = new THREE.Fog(col(COLORS.sky), 55, 120);
 
   const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 300);
-  const CAM_OFFSET = new V3(0, 13, 10);
+  const CAM_OFFSET = new V3(0, 11.5, 9);
   let camZoom = 1;
-  const baseZoom = () => (window.innerWidth / window.innerHeight < 0.8 ? 1.45 : 1);
+  const portrait = () => window.innerWidth / window.innerHeight < 0.8;
+  const baseZoom = () => (portrait() ? 1.45 : 1);
 
   scene.add(new THREE.HemisphereLight(0xeaf7ff, 0x4a6b45, 0.7));
   const sun = new THREE.DirectionalLight(0xfff1d6, 0.8);
@@ -103,8 +130,8 @@
      TERRENO VOXEL
      ========================================================= */
   const R = WORLD.R;
-  const heights = new Map();   // "x,z" -> altura (0 = água)
-  const surface = new Map();   // "x,z" -> "grass" | "sand" | "stone" | zona
+  const heights = new Map();
+  const surface = new Map();
   const key = (x, z) => x + "," + z;
 
   function islandRadius(x, z) {
@@ -118,7 +145,6 @@
     return null;
   }
 
-  // 1) altura bruta
   for (let x = -R - 6; x <= R + 6; x++) {
     for (let z = -R - 6; z <= R + 6; z++) {
       const d = Math.hypot(x, z);
@@ -132,14 +158,13 @@
       surface.set(key(x, z), d > r - 2.6 ? "sand" : "grass");
     }
   }
-  // 2) suaviza para que vizinhos difiram no máximo 1 bloco (sempre dá para subir)
+  // vizinhos diferem no máximo 1 bloco: sempre dá para subir
   for (let pass = 0; pass < 6; pass++) {
     for (const [k, h] of heights) {
       const [x, z] = k.split(",").map(Number);
       let minN = Infinity;
       for (const [dx, dz] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
-        const hn = heights.get(key(x + dx, z + dz)) ?? 0;
-        minN = Math.min(minN, hn);
+        minN = Math.min(minN, heights.get(key(x + dx, z + dz)) ?? 0);
       }
       if (h > minN + 1) heights.set(k, Math.max(1, minN + 1));
     }
@@ -151,10 +176,8 @@
       }
     }
   }
-
   const heightAt = (x, z) => heights.get(key(Math.round(x), Math.round(z))) ?? 0;
 
-  // 3) monta só os blocos visíveis (topo ou lateral exposta)
   const blocks = [];
   for (const [k, h] of heights) {
     const [x, z] = k.split(",").map(Number);
@@ -169,9 +192,8 @@
       let color;
       if (top) {
         if (typeof surf === "object") {
-          const zn = surf;
-          const edge = Math.max(Math.abs(x - zn.x), Math.abs(z - zn.z)) === zn.half;
-          color = edge ? zn.accent : COLORS.stone[(x + z) & 1];
+          const edge = Math.max(Math.abs(x - surf.x), Math.abs(z - surf.z)) === surf.half;
+          color = edge ? surf.accent : COLORS.stone[(x + z) & 1];
         } else {
           color = pick(COLORS[surf]);
         }
@@ -185,27 +207,28 @@
   const boxGeo = new THREE.BoxGeometry(1, 1, 1);
   const voxelMat = new THREE.MeshLambertMaterial({ color: 0xffffff });
 
-  function instanced(list, size = 1, material = voxelMat) {
+  /* InstancedMesh de cubos. "origin" permite girar o conjunto em torno de um pivô. */
+  function instanced(list, material = voxelMat, origin = null, parent = scene) {
     const mesh = new THREE.InstancedMesh(boxGeo, material, list.length);
     const m = new THREE.Matrix4();
     const c = new THREE.Color();
+    const ox = origin ? origin.x : 0, oy = origin ? origin.y : 0, oz = origin ? origin.z : 0;
     list.forEach((b, i) => {
-      const s = b.s || size;
-      m.makeScale(s, b.sy || s, s);
-      m.setPosition(b.x, b.y + (b.sy || s) / 2, b.z);
+      const s = b.s || 1, sy = b.sy || s;
+      m.makeScale(s, sy, s);
+      m.setPosition(b.x - ox, b.y + sy / 2 - oy, b.z - oz);
       mesh.setMatrixAt(i, m);
       c.set(b.color).convertSRGBToLinear();
-      c.offsetHSL(0, 0, (hash(b.x * 3 + b.y, b.z * 7 - b.y) - 0.5) * 0.04);
+      c.offsetHSL(0, 0, (hash(Math.round(b.x * 3 + b.y), Math.round(b.z * 7 - b.y)) - 0.5) * 0.04);
       mesh.setColorAt(i, c);
     });
     mesh.castShadow = true;
     mesh.receiveShadow = true;
-    scene.add(mesh);
+    parent.add(mesh);
     return mesh;
   }
   instanced(blocks);
 
-  // água e fundo do mar
   const water = new THREE.Mesh(
     new THREE.PlaneGeometry(400, 400),
     new THREE.MeshLambertMaterial({ color: col(COLORS.water), transparent: true, opacity: 0.8 })
@@ -224,6 +247,7 @@
      ========================================================= */
   const colliders = []; // círculos {x, z, r}
   const decoBlocks = [];
+  const treeData = [];
 
   function freeSpot(x, z, minDist) {
     if (surface.get(key(x, z)) !== "grass") return false;
@@ -234,11 +258,8 @@
     return !colliders.some((c) => Math.hypot(c.x - x, c.z - z) < minDist);
   }
 
-  // árvores (cada uma com material próprio, para ficar transparente quando tampa o lutador)
-  const treeData = [];
   const cells = [...heights.keys()].map((k) => k.split(",").map(Number));
-  let trees = 0;
-  for (let i = 0; i < 4000 && trees < 30; i++) {
+  for (let i = 0, trees = 0; i < 4000 && trees < 30; i++) {
     const [x, z] = pick(cells);
     if (!freeSpot(x, z, 3.2)) continue;
     const base = heights.get(key(x, z));
@@ -258,11 +279,10 @@
     }
     tb.push({ x, y: top + 2, z, color: leaf });
     colliders.push({ x, z, r: 0.75 });
-    treeData.push({ x, z, blocks: tb });
+    treeData.push({ x, z, base, top, leaf, blocks: tb });
     trees++;
   }
 
-  // pedras
   for (let i = 0, n = 0; i < 3000 && n < 16; i++) {
     const [x, z] = pick(cells);
     if (!freeSpot(x, z, 2.5)) continue;
@@ -274,7 +294,6 @@
     n++;
   }
 
-  // flores (sem colisão)
   for (let i = 0, n = 0; i < 3000 && n < 90; i++) {
     const [x, z] = pick(cells);
     if (surface.get(key(x, z)) !== "grass" || zoneAt(x, z)) continue;
@@ -283,30 +302,17 @@
     n++;
   }
   instanced(decoBlocks);
-  const treeMeshes = treeData.map((t) => {
+
+  /* Cada árvore num grupo próprio, com pivô na base: dá para balançar e ficar transparente. */
+  const treeObjs = treeData.map((t) => {
+    const group = new THREE.Group();
+    group.position.set(t.x, t.base, t.z);
+    scene.add(group);
     const material = new THREE.MeshLambertMaterial({ color: 0xffffff, transparent: true, opacity: 1 });
-    const mesh = instanced(t.blocks, 1, material);
-    return { x: t.x, z: t.z, mesh, material };
+    instanced(t.blocks, material, { x: t.x, y: t.base, z: t.z }, group);
+    return { ...t, group, material, wobble: 0, wobbleV: 0, dirX: 0, dirZ: 0 };
   });
 
-  /* Árvore entre a câmera e o lutador fica quase transparente. */
-  function updateTreeFade(dt) {
-    const px = player.pos.x, pz = player.pos.z;
-    const cx = camera.position.x, cz = camera.position.z;
-    const vx = cx - px, vz = cz - pz;
-    const len2 = vx * vx + vz * vz || 1;
-    for (const t of treeMeshes) {
-      const u = clamp(((t.x - px) * vx + (t.z - pz) * vz) / len2, 0, 1);
-      const dx = px + vx * u - t.x, dz = pz + vz * u - t.z;
-      const blocking = u > 0.02 && u < 0.85 && Math.hypot(dx, dz) < 2.1;
-      const target = blocking ? 0.22 : 1;
-      t.material.opacity = lerp(t.material.opacity, target, damp(8, dt));
-      t.material.depthWrite = t.material.opacity > 0.95;
-      t.mesh.castShadow = true;
-    }
-  }
-
-  // nuvens
   const clouds = [];
   const cloudMat = new THREE.MeshLambertMaterial({ color: COLORS.cloud, transparent: true, opacity: 0.92 });
   for (let i = 0; i < 9; i++) {
@@ -326,17 +332,8 @@
   }
 
   /* =========================================================
-     LUTADOR VOXEL
+     PEÇAS VOXEL (personagem, boneco)
      ========================================================= */
-  const DEFAULT_LOOK = {
-    skin: "#d9a066",
-    hair: "curto",
-    hairColor: "#1f1f1f",
-    outfit: "kimono",
-    outfitColor: "#f5f5f5",
-    band: "#ef4444",
-  };
-
   const matCache = new Map();
   function mat(color) {
     if (!matCache.has(color)) matCache.set(color, new THREE.MeshLambertMaterial({ color: col(color) }));
@@ -352,16 +349,21 @@
     return m;
   }
 
-  function makeFighter(look = DEFAULT_LOOK) {
+  function isDark(hex) {
+    const c = new THREE.Color(hex);
+    return c.r * 0.3 + c.g * 0.59 + c.b * 0.11 < 0.3;
+  }
+
+  function makeFighter(look) {
     const root = new THREE.Group();
-    const body = new THREE.Group(); // tudo que balança junto
+    const body = new THREE.Group();
     root.add(body);
 
     const sleeves = look.outfit === "regata" ? look.skin : look.outfitColor;
     const pants = look.outfit === "jaqueta" ? "#1f2937" : look.outfitColor;
     const shin = look.outfit === "regata" ? look.skin : pants;
+    const belt = look.outfit === "kimono" ? (isDark(look.outfitColor) ? "#f2c14e" : "#111827") : "#374151";
 
-    // pernas (pivô no quadril)
     const legs = [-0.2, 0.2].map((x) => {
       const hip = new THREE.Group();
       hip.position.set(x, 0.82, 0);
@@ -372,27 +374,24 @@
       return hip;
     });
 
-    // tronco
     const torso = new THREE.Group();
     torso.position.y = 0.82;
     body.add(torso);
     box(torso, 0.78, 0.72, 0.44, look.outfitColor, 0, 0.36, 0);
-    box(torso, 0.8, 0.1, 0.46, look.outfit === "kimono" ? "#111827" : "#374151", 0, 0.05, 0);
+    box(torso, 0.8, 0.1, 0.46, belt, 0, 0.05, 0);
     if (look.outfit === "kimono") box(torso, 0.22, 0.3, 0.02, look.skin, 0, 0.56, 0.225);
     if (look.outfit === "jaqueta") box(torso, 0.06, 0.62, 0.02, look.band === "none" ? "#9ca3af" : look.band, 0, 0.38, 0.225);
 
-    // braços (pivô no ombro), já em postura de guarda
     const arms = [-1, 1].map((side) => {
       const shoulder = new THREE.Group();
       shoulder.position.set(side * 0.52, 0.66, 0);
       box(shoulder, 0.24, 0.4, 0.26, sleeves, 0, -0.18, 0);
       box(shoulder, 0.22, 0.26, 0.24, look.skin, 0, -0.49, 0);
-      box(shoulder, 0.26, 0.22, 0.28, look.skin, 0, -0.7, 0.01); // punho
+      box(shoulder, 0.26, 0.22, 0.28, look.skin, 0, -0.7, 0.01);
       torso.add(shoulder);
       return shoulder;
     });
 
-    // cabeça
     const head = new THREE.Group();
     head.position.y = 0.76;
     torso.add(head);
@@ -432,28 +431,34 @@
   const SPEED = { walk: 4.6, run: 8.4 };
   const GRAVITY = 24;
   const JUMP = 8.4;
+  const SPAWN = { x: 0, z: 0 };
 
+  const savedLook = store.get("arenaLook");
   const player = {
-    pos: new V3(0, heightAt(0, 3), 3),
+    pos: new V3(SPAWN.x, heightAt(SPAWN.x, SPAWN.z), SPAWN.z),
     vel: new V3(),
     vy: 0,
     onGround: true,
     yaw: 0,
-    renderY: heightAt(0, 3),
+    renderY: heightAt(SPAWN.x, SPAWN.z),
     walkPhase: 0,
-    look: { ...DEFAULT_LOOK },
+    look: { ...DEFAULT_LOOK, ...(savedLook || {}) },
     model: null,
+    attack: null,     // { type, side, t, dur, hitAt, hit }
+    nextSide: 1,
   };
 
   function setLook(look) {
+    const keepPos = player.model ? player.model.root.position.clone() : null;
     if (player.model) scene.remove(player.model.root);
     player.look = { ...look };
     player.model = makeFighter(player.look);
+    if (keepPos) player.model.root.position.copy(keepPos);
+    player.model.root.rotation.y = player.yaw;
     scene.add(player.model.root);
   }
-  setLook(DEFAULT_LOOK);
+  setLook(player.look);
 
-  // sombra redonda sob o personagem (lê melhor que a sombra do sol durante o pulo)
   const blob = new THREE.Mesh(
     new THREE.CircleGeometry(0.42, 20),
     new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.22, depthWrite: false })
@@ -461,7 +466,6 @@
   blob.rotation.x = -Math.PI / 2;
   scene.add(blob);
 
-  /* Altura do chão sob o pé, olhando a área ocupada pelo personagem. */
   const FOOT = [[0, 0], [RADIUS, 0], [-RADIUS, 0], [0, RADIUS], [0, -RADIUS]];
   function groundUnder(x, z) {
     let max = 0;
@@ -471,8 +475,8 @@
   function walkable(x, z, feetY, grounded) {
     for (const [dx, dz] of FOOT) {
       const h = heightAt(x + dx, z + dz);
-      if (h === 0) return false;                        // água
-      if (h > feetY + (grounded ? 1.01 : 0.35)) return false; // parede alta demais
+      if (h === 0) return false;
+      if (h > feetY + (grounded ? 1.01 : 0.35)) return false;
     }
     return true;
   }
@@ -489,7 +493,215 @@
   }
 
   /* =========================================================
-     ENTRADA (teclado)
+     BONECO DE TREINO (bloco 3)
+     ========================================================= */
+  const treino = zoneById("treino");
+  const dummy = (() => {
+    const base = heightAt(treino.x, treino.z);
+    const group = new THREE.Group();
+    group.position.set(treino.x, base, treino.z);
+    scene.add(group);
+    box(group, 1, 0.25, 1, "#6b7280", 0, 0.125, 0);
+    const pivot = new THREE.Group(); // balança em torno da base
+    pivot.position.y = 0.25;
+    group.add(pivot);
+    box(pivot, 0.22, 1.1, 0.22, "#7a4b25", 0, 0.55, 0);
+    box(pivot, 0.72, 0.9, 0.5, "#d6b26e", 0, 1.4, 0);
+    box(pivot, 0.76, 0.08, 0.54, "#a16207", 0, 1.1, 0);
+    box(pivot, 1.4, 0.16, 0.16, "#7a4b25", 0, 1.65, 0);
+    box(pivot, 0.5, 0.5, 0.5, "#e9d8a6", 0, 2.12, 0);
+    box(pivot, 0.34, 0.34, 0.02, "#ffffff", 0, 2.12, 0.26);
+    box(pivot, 0.22, 0.22, 0.03, "#ef4444", 0, 2.12, 0.265);
+    box(pivot, 0.1, 0.1, 0.04, "#ffffff", 0, 2.12, 0.27);
+    colliders.push({ x: treino.x, z: treino.z, r: 0.55 });
+    return { group, pivot, x: treino.x, z: treino.z, tilt: 0, tiltV: 0, dirX: 0, dirZ: 1, dmg: 0 };
+  })();
+
+  /* Alvos que reagem a golpes. */
+  const targets = [
+    {
+      kind: "dummy", x: dummy.x, z: dummy.z, r: 0.55,
+      onHit(dirX, dirZ, attack, combo) {
+        dummy.dirX = dirX; dummy.dirZ = dirZ;
+        dummy.tiltV += attack.type === "kick" ? 7 : 4.5;
+        const at = new V3(dummy.x, dummy.group.position.y + 2.2, dummy.z);
+        burst(at, ["#d6b26e", "#e9d8a6", "#a16207"], attack.type === "kick" ? 16 : 10, 4.5);
+        const text = DAMAGE[dummy.dmg++ % DAMAGE.length];
+        floatText(text, at, attack.type === "kick" || combo >= 3 ? "big" : "");
+        if (combo >= 3) floatText(`COMBO x${combo}`, at.clone().add(new V3(0, 0.9, 0)), "combo");
+      },
+    },
+    ...treeObjs.map((t) => ({
+      kind: "tree", x: t.x, z: t.z, r: 0.75,
+      onHit(dirX, dirZ, attack) {
+        t.dirX = dirX; t.dirZ = dirZ;
+        t.wobbleV += attack.type === "kick" ? 1.6 : 1;
+        burst(new V3(t.x, t.top + 0.5, t.z), [t.leaf, ...COLORS.leaves], 8, 3);
+      },
+    })),
+  ];
+
+  function updateSprings(dt) {
+    dummy.tiltV += (-60 * dummy.tilt - 5 * dummy.tiltV) * dt;
+    dummy.tilt += dummy.tiltV * dt;
+    dummy.tilt = clamp(dummy.tilt, -0.7, 0.7);
+    dummy.pivot.rotation.x = dummy.dirZ * dummy.tilt * 0.6;
+    dummy.pivot.rotation.z = -dummy.dirX * dummy.tilt * 0.6;
+    for (const t of treeObjs) {
+      if (Math.abs(t.wobble) < 0.0005 && Math.abs(t.wobbleV) < 0.0005) continue;
+      t.wobbleV += (-90 * t.wobble - 7 * t.wobbleV) * dt;
+      t.wobble += t.wobbleV * dt;
+      t.group.rotation.x = t.dirZ * t.wobble * 0.08;
+      t.group.rotation.z = -t.dirX * t.wobble * 0.08;
+    }
+  }
+
+  /* =========================================================
+     PARTÍCULAS, TEXTOS FLUTUANTES, TREMOR, SOM
+     ========================================================= */
+  const particles = [];
+  const POOL = 90;
+  for (let i = 0; i < POOL; i++) {
+    const m = new THREE.Mesh(boxGeo, mat("#ffffff"));
+    m.visible = false;
+    scene.add(m);
+    particles.push({ m, vel: new V3(), life: 0 });
+  }
+  let pIdx = 0;
+  function burst(at, colors, n, speed) {
+    for (let i = 0; i < n; i++) {
+      const p = particles[pIdx++ % POOL];
+      p.m.material = mat(pickAny(colors));
+      p.m.position.copy(at);
+      const s = 0.09 + Math.random() * 0.12;
+      p.m.scale.set(s, s, s);
+      p.m.visible = true;
+      p.vel.set((Math.random() - 0.5) * speed, Math.random() * speed * 0.9 + 1.5, (Math.random() - 0.5) * speed);
+      p.life = 0.6 + Math.random() * 0.4;
+    }
+  }
+  function updateParticles(dt) {
+    for (const p of particles) {
+      if (p.life <= 0) continue;
+      p.life -= dt;
+      p.vel.y -= 16 * dt;
+      p.m.position.addScaledVector(p.vel, dt);
+      p.m.rotation.x += dt * 8;
+      p.m.rotation.y += dt * 6;
+      const g = heightAt(p.m.position.x, p.m.position.z);
+      if (p.m.position.y < g) { p.m.position.y = g; p.vel.multiplyScalar(0.4); p.vel.y = Math.abs(p.vel.y) * 0.3; }
+      if (p.life <= 0) p.m.visible = false;
+    }
+  }
+
+  const floatersEl = $("floaters");
+  const floaters = [];
+  const projV = new V3();
+  function toScreen(v) {
+    projV.copy(v).project(camera);
+    return {
+      x: (projV.x * 0.5 + 0.5) * window.innerWidth,
+      y: (-projV.y * 0.5 + 0.5) * window.innerHeight,
+      visible: projV.z < 1,
+    };
+  }
+  function floatText(text, at, cls = "") {
+    const el = document.createElement("div");
+    el.className = "floater " + cls;
+    el.textContent = text;
+    floatersEl.appendChild(el);
+    floaters.push({ el, pos: at.clone().add(new V3((Math.random() - 0.5) * 0.6, 0, 0)), life: 1.1, max: 1.1 });
+  }
+  function updateFloaters(dt) {
+    for (let i = floaters.length - 1; i >= 0; i--) {
+      const f = floaters[i];
+      f.life -= dt;
+      f.pos.y += dt * 1.4;
+      const s = toScreen(f.pos);
+      const k = f.life / f.max;
+      f.el.style.left = s.x + "px";
+      f.el.style.top = s.y + "px";
+      f.el.style.opacity = String(clamp(k * 2, 0, 1));
+      f.el.style.transform = `translate(-50%, -50%) scale(${1 + (1 - k) * 0.25})`;
+      if (f.life <= 0) { f.el.remove(); floaters.splice(i, 1); }
+    }
+  }
+
+  /* Placa com o nome do lutador e rótulos fixos no mundo. */
+  const labels = [];
+  const tmp2 = new V3();
+  function addLabel(text, getPos, cls = "label") {
+    const el = document.createElement("div");
+    el.className = "floater " + cls;
+    el.textContent = text;
+    floatersEl.appendChild(el);
+    const l = { el, getPos, maxDist: 26, hidden: false };
+    labels.push(l);
+    return l;
+  }
+  const nameTag = addLabel("", () => tmp2.copy(player.model.root.position).add(new V3(0, 2.55, 0)), "label name");
+  const treinoLabel = addLabel("TREINO · bata no boneco", () => new V3(dummy.x, dummy.group.position.y + 3.1, dummy.z));
+  treinoLabel.minDist = 3.5; // some quando você está batendo, para não cobrir o dano
+  function updateLabels() {
+    for (const l of labels) {
+      if (l.hidden || mode !== "play") { l.el.style.display = "none"; continue; }
+      const p = l.getPos();
+      const s = toScreen(p);
+      const dist = Math.hypot(p.x - player.pos.x, p.z - player.pos.z);
+      const far = dist > l.maxDist || dist < (l.minDist || 0);
+      l.el.style.display = s.visible && !far ? "" : "none";
+      l.el.style.left = s.x + "px";
+      l.el.style.top = s.y + "px";
+    }
+  }
+
+  let shake = 0;
+  let hitStop = 0;
+
+  const audio = {
+    ctx: null,
+    muted: store.get("arenaMuted") === true,
+    init() {
+      if (this.ctx) return;
+      try { this.ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {}
+    },
+    noise(dur, freq, gain, type = "lowpass") {
+      if (!this.ctx || this.muted) return;
+      const c = this.ctx, t = c.currentTime;
+      const buf = c.createBuffer(1, Math.floor(c.sampleRate * dur), c.sampleRate);
+      const d = buf.getChannelData(0);
+      for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / d.length);
+      const src = c.createBufferSource();
+      src.buffer = buf;
+      const f = c.createBiquadFilter();
+      f.type = type; f.frequency.value = freq;
+      const g = c.createGain();
+      g.gain.setValueAtTime(gain, t);
+      g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+      src.connect(f).connect(g).connect(c.destination);
+      src.start(t);
+    },
+    thump(freq, gain) {
+      if (!this.ctx || this.muted) return;
+      const c = this.ctx, t = c.currentTime;
+      const o = c.createOscillator();
+      o.type = "sine";
+      o.frequency.setValueAtTime(freq, t);
+      o.frequency.exponentialRampToValueAtTime(freq * 0.4, t + 0.15);
+      const g = c.createGain();
+      g.gain.setValueAtTime(gain, t);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.18);
+      o.connect(g).connect(c.destination);
+      o.start(t);
+      o.stop(t + 0.2);
+    },
+    swing() { this.noise(0.12, 2600, 0.05, "highpass"); },
+    hit(strong) { this.noise(0.16, strong ? 900 : 1300, strong ? 0.35 : 0.25); this.thump(strong ? 110 : 150, strong ? 0.5 : 0.35); },
+    jump() { this.thump(320, 0.08); },
+  };
+
+  /* =========================================================
+     ENTRADA
      ========================================================= */
   const keys = new Set();
   const CODES = {
@@ -499,22 +711,125 @@
     right: ["KeyD", "ArrowRight"],
     run: ["ShiftLeft", "ShiftRight"],
     jump: ["Space"],
+    punch: ["KeyJ"],
+    kick: ["KeyK"],
+    edit: ["KeyC"],
+    mute: ["KeyM"],
   };
   const held = (action) => CODES[action].some((c) => keys.has(c));
   let jumpQueued = false;
+  let attackQueued = null;
+  let mode = "creator"; // "creator" | "play"
 
   window.addEventListener("keydown", (e) => {
     if (e.target && e.target.tagName === "INPUT") return;
-    if (CODES.jump.includes(e.code) && !e.repeat) jumpQueued = true;
-    if (Object.values(CODES).flat().includes(e.code)) e.preventDefault();
-    keys.add(e.code);
+    if (mode !== "play") return;
+    const code = e.code;
+    if (Object.values(CODES).flat().includes(code)) e.preventDefault();
+    if (!e.repeat) {
+      if (CODES.jump.includes(code)) jumpQueued = true;
+      if (CODES.punch.includes(code)) attackQueued = "punch";
+      if (CODES.kick.includes(code)) attackQueued = "kick";
+      if (CODES.edit.includes(code)) openCreator();
+      if (CODES.mute.includes(code)) toggleMute();
+    }
+    keys.add(code);
   });
   window.addEventListener("keyup", (e) => keys.delete(e.code));
   window.addEventListener("blur", () => keys.clear());
   canvas.addEventListener("wheel", (e) => {
     e.preventDefault();
-    camZoom = clamp(camZoom + Math.sign(e.deltaY) * 0.08, 0.65, 1.5);
+    if (mode === "play") camZoom = clamp(camZoom + Math.sign(e.deltaY) * 0.08, 0.65, 1.5);
   }, { passive: false });
+
+  function toggleMute() {
+    audio.muted = !audio.muted;
+    store.set("arenaMuted", audio.muted);
+    toast(audio.muted ? "Som desligado" : "Som ligado");
+  }
+  let toastTimer = null;
+  function toast(text, ms = 2200) {
+    const el = $("toast");
+    el.textContent = text;
+    el.classList.remove("hidden");
+    el.style.animation = "none";
+    void el.offsetWidth;
+    el.style.animation = "";
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.add("hidden"), ms);
+  }
+
+  /* =========================================================
+     GOLPES (bloco 3)
+     ========================================================= */
+  const ATTACKS = {
+    punch: { dur: 0.3, hitAt: 0.11, reach: 1.05 },
+    kick: { dur: 0.46, hitAt: 0.2, reach: 1.35 },
+  };
+  let combo = 0;
+  let lastHitAt = -10;
+
+  function canAttack(type) {
+    if (!player.attack) return true;
+    // dá para encadear socos rápidos depois do ponto de acerto
+    return player.attack.type === "punch" && type === "punch" && player.attack.t > player.attack.hitAt + 0.04;
+  }
+
+  /* Golpe apertado cedo demais fica guardado um instante, como nos jogos de luta. */
+  let buffered = null;
+  function queueAttack(type, dt) {
+    if (type) buffered = { type, ttl: 0.35 };
+    if (!buffered) return;
+    if (canAttack(buffered.type)) {
+      startAttack(buffered.type);
+      buffered = null;
+    } else {
+      buffered.ttl -= dt;
+      if (buffered.ttl <= 0) buffered = null;
+    }
+  }
+
+  function startAttack(type) {
+    const a = ATTACKS[type];
+    const side = type === "punch" ? (player.nextSide = -player.nextSide) : 1;
+    // mira assistida: vira para o alvo mais próximo à frente; se estiver colado, vira até para trás
+    const near = nearestTarget(2.4, -0.2) || nearestTarget(1.6, -1.01);
+    if (near) player.yaw = Math.atan2(near.x - player.pos.x, near.z - player.pos.z);
+    player.attack = { type, side, t: 0, dur: a.dur, hitAt: a.hitAt, reach: a.reach, hit: false };
+    audio.swing();
+  }
+
+  function nearestTarget(range, minDot) {
+    const fx = Math.sin(player.yaw), fz = Math.cos(player.yaw);
+    let best = null, bestD = Infinity;
+    for (const t of targets) {
+      const dx = t.x - player.pos.x, dz = t.z - player.pos.z;
+      const d = Math.hypot(dx, dz) - t.r;
+      if (d > range) continue;
+      const dot = (dx * fx + dz * fz) / (Math.hypot(dx, dz) || 1);
+      if (dot < minDot) continue;
+      if (d < bestD) { bestD = d; best = t; }
+    }
+    return best;
+  }
+
+  function resolveHit() {
+    const a = player.attack;
+    const t = nearestTarget(a.reach, 0.35);
+    if (!t) return;
+    const now = performance.now() / 1000;
+    combo = now - lastHitAt < 0.9 ? combo + 1 : 1;
+    lastHitAt = now;
+    const dx = t.x - player.pos.x, dz = t.z - player.pos.z;
+    const len = Math.hypot(dx, dz) || 1;
+    t.onHit(dx / len, dz / len, a, combo);
+    const strong = a.type === "kick" || combo >= 3;
+    audio.hit(strong);
+    if (!reduceMotion) shake = Math.max(shake, strong ? 0.32 : 0.18);
+    hitStop = strong ? 0.08 : 0.05;
+    hits.total++;
+  }
+  const hits = { total: 0 };
 
   /* =========================================================
      ATUALIZAÇÃO DO JOGADOR
@@ -522,21 +837,24 @@
   const tmp = new V3();
 
   function updatePlayer(dt) {
-    // direção relativa à câmera fixa: W afasta, S aproxima
     tmp.set(0, 0, 0);
-    if (held("up")) tmp.z -= 1;
-    if (held("down")) tmp.z += 1;
-    if (held("left")) tmp.x -= 1;
-    if (held("right")) tmp.x += 1;
-    const moving = tmp.lengthSq() > 0;
-    if (moving) tmp.normalize();
+    if (mode === "play") {
+      if (held("up")) tmp.z -= 1;
+      if (held("down")) tmp.z += 1;
+      if (held("left")) tmp.x -= 1;
+      if (held("right")) tmp.x += 1;
+    }
+    if (tmp.lengthSq() > 0) tmp.normalize();
 
-    const speed = held("run") ? SPEED.run : SPEED.walk;
+    if (mode === "play") queueAttack(attackQueued, dt);
+    attackQueued = null;
+
+    const attacking = !!player.attack;
+    const speed = (held("run") ? SPEED.run : SPEED.walk) * (attacking && player.onGround ? 0.25 : 1);
     const accel = player.onGround ? 14 : 5;
     player.vel.x = lerp(player.vel.x, tmp.x * speed, damp(accel, dt));
     player.vel.z = lerp(player.vel.z, tmp.z * speed, damp(accel, dt));
 
-    // movimento horizontal, eixo por eixo, para deslizar nas paredes
     const p = player.pos;
     const nx = p.x + player.vel.x * dt;
     if (walkable(nx, p.z, p.y, player.onGround)) p.x = nx; else player.vel.x = 0;
@@ -544,10 +862,10 @@
     if (walkable(p.x, nz, p.y, player.onGround)) p.z = nz; else player.vel.z = 0;
     pushOutOfColliders(p);
 
-    // pulo e gravidade
-    if (jumpQueued && player.onGround) {
+    if (jumpQueued && player.onGround && mode === "play") {
       player.vy = JUMP;
       player.onGround = false;
+      audio.jump();
     }
     jumpQueued = false;
     player.vy -= GRAVITY * dt;
@@ -555,34 +873,40 @@
 
     const ground = groundUnder(p.x, p.z);
     if (p.y <= ground) {
-      p.y = ground;          // inclui subir um degrau andando
+      p.y = ground;
       player.vy = 0;
       player.onGround = true;
     } else if (p.y > ground + 0.05) {
       player.onGround = false;
     }
 
-    // vira para onde anda
     const horiz = Math.hypot(player.vel.x, player.vel.z);
-    if (horiz > 0.3) {
+    if (mode === "creator") {
+      player.yaw += dt * 0.7;
+    } else if (horiz > 0.3 && !attacking) {
       const target = Math.atan2(player.vel.x, player.vel.z);
       let diff = target - player.yaw;
       diff = Math.atan2(Math.sin(diff), Math.cos(diff));
       player.yaw += diff * damp(14, dt);
     }
 
-    animateFighter(dt, horiz, speed);
+    if (player.attack) {
+      const a = player.attack;
+      a.t += dt;
+      if (!a.hit && a.t >= a.hitAt) { a.hit = true; resolveHit(); }
+      if (a.t >= a.dur) player.attack = null;
+    }
+
+    animateFighter(dt, horiz);
   }
 
-  /* Animação procedural: guarda, caminhada, corrida e pulo. */
-  function animateFighter(dt, horiz, speed) {
+  function animateFighter(dt, horiz) {
     const f = player.model;
     const t = performance.now() / 1000;
     const moveAmt = clamp(horiz / SPEED.walk, 0, 1.6);
     player.walkPhase += dt * (4 + horiz * 1.6);
     const s = Math.sin(player.walkPhase);
 
-    // suaviza o degrau visualmente
     player.renderY = lerp(player.renderY, player.pos.y, damp(18, dt));
     f.root.position.set(player.pos.x, player.renderY, player.pos.z);
     f.root.rotation.y = player.yaw;
@@ -590,24 +914,55 @@
     const air = !player.onGround;
     const swing = air ? 0 : s * 0.75 * Math.min(moveAmt, 1.2);
 
-    f.legs[0].rotation.x = air ? -0.7 : swing;
-    f.legs[1].rotation.x = air ? 0.35 : -swing;
-
-    // guarda: punhos à frente do rosto, balançando levemente
+    // pose base: guarda
     const guard = -1.25 + Math.sin(t * 3) * 0.05;
-    f.arms[0].rotation.x = guard - (air ? 0.6 : -swing * 0.35);
-    f.arms[1].rotation.x = guard - (air ? 0.6 : swing * 0.35);
-    f.arms[0].rotation.z = 0.25;
-    f.arms[1].rotation.z = -0.25;
+    let armL = guard - (air ? 0.6 : -swing * 0.35);
+    let armR = guard - (air ? 0.6 : swing * 0.35);
+    let armLz = 0.25, armRz = -0.25;
+    let reachL = 0, reachR = 0;
+    let legL = air ? -0.7 : swing;
+    let legR = air ? 0.35 : -swing;
+    let twist = Math.sin(t * 1.5) * 0.04;
+    let lean = clamp(horiz / SPEED.run, 0, 1) * 0.22;
+    let lunge = 0;
 
-    // respiração e inclinação ao correr
+    const a = player.attack;
+    if (a) {
+      // curva do golpe: sai rápido, volta devagar
+      const k = a.t < a.hitAt ? a.t / a.hitAt : 1 - (a.t - a.hitAt) / (a.dur - a.hitAt);
+      const e = clamp(k, 0, 1);
+      if (a.type === "punch") {
+        const straight = lerp(guard, -1.62, e);
+        if (a.side > 0) { armR = straight; armRz = lerp(-0.25, 0.05, e); reachR = 0.28 * e; }
+        else { armL = straight; armLz = lerp(0.25, -0.05, e); reachL = 0.28 * e; }
+        twist = a.side * 0.45 * e;
+        lunge = 0.12 * e;
+      } else {
+        legR = lerp(legR, -1.55, e);
+        legL = lerp(legL, 0.25, e);
+        lean = -0.3 * e;
+        armL = lerp(armL, -0.4, e); armLz = lerp(0.25, 0.9, e);
+        twist = -0.35 * e;
+      }
+    }
+
+    f.legs[0].rotation.x = legL;
+    f.legs[1].rotation.x = legR;
+    f.arms[0].rotation.x = armL;
+    f.arms[1].rotation.x = armR;
+    f.arms[0].rotation.z = armLz;
+    f.arms[1].rotation.z = armRz;
+    f.arms[0].position.z = reachL;
+    f.arms[1].position.z = reachR;
+
     f.body.position.y = air ? 0 : Math.abs(s) * 0.06 * moveAmt + Math.sin(t * 3) * 0.015;
-    f.torso.rotation.x = clamp(horiz / SPEED.run, 0, 1) * 0.22;
-    f.torso.rotation.y = Math.sin(t * 1.5) * 0.04;
+    f.body.position.z = lunge;
+    f.torso.rotation.x = lean;
+    f.torso.rotation.y = twist;
 
-    blob.position.set(player.pos.x, groundUnder(player.pos.x, player.pos.z) + 0.02, player.pos.z);
-    const lift = player.pos.y - groundUnder(player.pos.x, player.pos.z);
-    blob.scale.setScalar(clamp(1 - lift * 0.18, 0.5, 1));
+    const g = groundUnder(player.pos.x, player.pos.z);
+    blob.position.set(player.pos.x, g + 0.02, player.pos.z);
+    blob.scale.setScalar(clamp(1 - (player.pos.y - g) * 0.18, 0.5, 1));
   }
 
   /* =========================================================
@@ -615,19 +970,152 @@
      ========================================================= */
   const camTarget = new V3();
   const camLook = new V3();
+  const CREATOR_CAM = {
+    wide: { pos: new V3(-2.4, 3.4, 6.2), look: new V3(-1.9, 0.85, 0) },
+    tall: { pos: new V3(0, 5.2, 8.4), look: new V3(0, -1.6, 0) },
+  };
+
   function updateCamera(dt, snap = false) {
-    camTarget.copy(CAM_OFFSET).multiplyScalar(camZoom * baseZoom()).add(player.model.root.position);
-    if (snap) camera.position.copy(camTarget);
-    else camera.position.lerp(camTarget, damp(3.5, dt));
-    tmp.copy(player.model.root.position);
-    tmp.y += 1.2;
-    if (snap) camLook.copy(tmp);
-    else camLook.lerp(tmp, damp(6, dt));
+    const root = player.model.root.position;
+    if (mode === "creator") {
+      const c = portrait() ? CREATOR_CAM.tall : CREATOR_CAM.wide;
+      camTarget.copy(c.pos).add(root);
+      tmp.copy(c.look).add(root);
+    } else {
+      camTarget.copy(CAM_OFFSET).multiplyScalar(camZoom * baseZoom()).add(root);
+      tmp.copy(root);
+      tmp.y += 1.2;
+    }
+    if (snap) { camera.position.copy(camTarget); camLook.copy(tmp); }
+    else {
+      camera.position.lerp(camTarget, damp(mode === "creator" ? 5 : 3.5, dt));
+      camLook.lerp(tmp, damp(6, dt));
+    }
+    if (shake > 0.001) {
+      camera.position.x += (Math.random() - 0.5) * shake;
+      camera.position.y += (Math.random() - 0.5) * shake;
+      shake *= Math.exp(-dt * 14);
+    }
     camera.lookAt(camLook);
 
-    // o sol acompanha o jogador para a sombra ter boa resolução
     sun.position.set(player.pos.x + 14, player.pos.y + 26, player.pos.z + 10);
     sun.target.position.copy(player.pos);
+  }
+
+  /* Árvore entre a câmera e o lutador fica quase transparente. */
+  function updateTreeFade(dt) {
+    const px = player.pos.x, pz = player.pos.z;
+    const vx = camera.position.x - px, vz = camera.position.z - pz;
+    const len2 = vx * vx + vz * vz || 1;
+    for (const t of treeObjs) {
+      const u = clamp(((t.x - px) * vx + (t.z - pz) * vz) / len2, 0, 1);
+      const dx = px + vx * u - t.x, dz = pz + vz * u - t.z;
+      const blocking = mode === "play" && u > 0.02 && u < 0.85 && Math.hypot(dx, dz) < 2.1;
+      t.material.opacity = lerp(t.material.opacity, blocking ? 0.22 : 1, damp(8, dt));
+      t.material.depthWrite = t.material.opacity > 0.95;
+    }
+  }
+
+  /* =========================================================
+     CRIAÇÃO DE PERSONAGEM (bloco 2)
+     ========================================================= */
+  const creatorEl = $("creator");
+  const nameInput = $("fighterName");
+
+  function renderOptions() {
+    for (const group of creatorEl.querySelectorAll("[data-opt]")) {
+      const opt = group.dataset.opt;
+      group.innerHTML = "";
+      for (const item of OPTIONS[opt]) {
+        const [value, text] = Array.isArray(item) ? item : [item, null];
+        const b = document.createElement("button");
+        b.type = "button";
+        b.dataset.value = value;
+        if (text) b.textContent = text;
+        else if (value === "none") { b.className = "none"; b.title = "Sem faixa"; b.setAttribute("aria-label", "Sem faixa"); }
+        else { b.style.background = value; b.setAttribute("aria-label", value); }
+        b.addEventListener("click", () => {
+          player.look[opt] = value;
+          applyLook();
+        });
+        group.appendChild(b);
+      }
+    }
+  }
+  function syncActive() {
+    for (const group of creatorEl.querySelectorAll("[data-opt]")) {
+      for (const b of group.children) b.classList.toggle("active", player.look[group.dataset.opt] === b.dataset.value);
+    }
+  }
+  function applyLook() {
+    setLook(player.look);
+    syncActive();
+    store.set("arenaLook", player.look);
+  }
+  function fighterName() {
+    return (player.look.name || "").trim() || "Visitante";
+  }
+  function updateName() {
+    nameTag.el.textContent = fighterName();
+    $("hudName").textContent = fighterName();
+  }
+  nameInput.addEventListener("input", () => {
+    player.look.name = nameInput.value.slice(0, 14);
+    store.set("arenaLook", player.look);
+    updateName();
+  });
+  nameInput.addEventListener("keydown", (e) => { if (e.key === "Enter") startGame(); });
+
+  $("randomBtn").addEventListener("click", () => {
+    for (const opt of ["skin", "hair", "hairColor", "outfit", "outfitColor", "band"]) {
+      const item = pickAny(OPTIONS[opt]);
+      player.look[opt] = Array.isArray(item) ? item[0] : item;
+    }
+    applyLook();
+  });
+  $("startBtn").addEventListener("click", startGame);
+  $("editBtn").addEventListener("click", openCreator);
+
+  function openCreator() {
+    mode = "creator";
+    keys.clear();
+    player.attack = null;
+    creatorEl.classList.remove("hidden");
+    $("hud").classList.add("hidden");
+    nameInput.value = player.look.name || "";
+  }
+  function startGame() {
+    audio.init();
+    if (audio.ctx && audio.ctx.state === "suspended") audio.ctx.resume();
+    mode = "play";
+    player.yaw = 0;
+    creatorEl.classList.add("hidden");
+    $("hud").classList.remove("hidden");
+    updateName();
+    if (document.activeElement) document.activeElement.blur();
+    if (!store.get("arenaHelloSeen")) {
+      toast("Vá até o TREINO e use J e K no boneco!", 3200);
+      store.set("arenaHelloSeen", true);
+    }
+  }
+
+  renderOptions();
+  syncActive();
+  updateName();
+
+  /* =========================================================
+     DICAS DE CONTEXTO
+     ========================================================= */
+  const promptEl = $("prompt");
+  function updatePrompt() {
+    if (mode !== "play") { promptEl.classList.add("hidden"); return; }
+    const d = Math.hypot(player.pos.x - dummy.x, player.pos.z - dummy.z);
+    if (d < 3.2) {
+      promptEl.textContent = "J soco · K chute";
+      promptEl.classList.remove("hidden");
+    } else {
+      promptEl.classList.add("hidden");
+    }
   }
 
   /* =========================================================
@@ -646,25 +1134,31 @@
     renderer.setSize(window.innerWidth, window.innerHeight);
   });
 
-  // Bloco 1: entra direto no mundo. A criação de personagem chega no bloco 2.
-  $("hud").classList.remove("hidden");
-  for (const id of ["quests"]) $(id).classList.add("hidden");
-  document.querySelector(".hud-player").classList.add("hidden");
-  for (const el of document.querySelectorAll('.hud-help span')) {
-    if (/soco|chute|abrir/.test(el.textContent)) el.classList.add("hidden");
+  // HUD do estágio atual: missões e "abrir" chegam nos blocos 4 e 5
+  $("quests").classList.add("hidden");
+  document.querySelector(".hud-bar").classList.add("hidden");
+  for (const el of document.querySelectorAll(".hud-help span")) {
+    if (/abrir/.test(el.textContent)) el.classList.add("hidden");
   }
 
   let last = performance.now();
+  openCreator();
   updatePlayer(0);
   updateCamera(0, true);
 
   function frame(now) {
-    const dt = Math.min((now - last) / 1000, 1 / 20);
+    let dt = Math.min((now - last) / 1000, 1 / 20);
     last = now;
+    if (hitStop > 0) { hitStop -= dt; dt *= 0.12; }
     updatePlayer(dt);
+    updateSprings(dt);
     updateCamera(dt);
     updateClouds(dt);
     updateTreeFade(dt);
+    updateParticles(dt);
+    updateFloaters(dt);
+    updateLabels();
+    updatePrompt();
     renderer.render(scene, camera);
     requestAnimationFrame(frame);
   }
@@ -676,5 +1170,8 @@
   });
 
   // ganchos para testes automatizados e para os próximos blocos
-  window.__arena = { player, heightAt, groundUnder, colliders, ZONES, setLook, makeFighter, scene, camera };
+  window.__arena = {
+    player, heightAt, groundUnder, colliders, ZONES, targets, dummy, setLook, hits,
+    get mode() { return mode; }, get combo() { return combo; }, startGame, openCreator,
+  };
 })();
