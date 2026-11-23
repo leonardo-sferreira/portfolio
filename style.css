@@ -383,11 +383,30 @@ h2 {
 .sobre-texto { text-align: left; }
 .sobre-texto p { margin-bottom: 16px; line-height: 1.7; }
 .sobre-texto strong { color: var(--text); font-weight: 600; }
+.sobre-intro {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  margin-bottom: 32px;
+}
+.sobre-foto {
+  width: 160px;
+  height: 160px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--accent-light);
+  box-shadow: 0 0 0 6px rgba(45,212,191,0.12), 0 12px 32px rgba(0,0,0,0.45);
+}
 .sobre-texto p.sobre-lead {
   font-size: 1.2rem;
   line-height: 1.6;
   color: var(--text);
-  margin-bottom: 28px;
+  margin-bottom: 0;
+}
+@media (max-width: 640px) {
+  .sobre-intro { flex-direction: column; text-align: center; gap: 20px; }
+  .sobre-foto { width: 140px; height: 140px; }
 }
 .sobre-bloco {
   border-left: 2px solid rgba(45,212,191,0.35);
@@ -1162,11 +1181,21 @@ h2 {
 /* ---------- CONTATO ---------- */
 .contato {
   text-align: center;
-  max-width: 600px;
+  max-width: 900px;
   margin: 0 auto;
   padding-bottom: 40px;
 }
-.contato p { color: var(--text-muted); margin-bottom: 32px; }
+.contato p { color: var(--text-muted); margin: 0 auto 32px; max-width: 600px; }
+.contato-actions { flex-wrap: nowrap; }
+.contato-actions a { white-space: nowrap; }
+@media (max-width: 760px) {
+  .contato-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .contato-actions a { justify-content: center; padding-left: 12px; padding-right: 12px; }
+}
 
 /* ---------- FOOTER ---------- */
 footer {
