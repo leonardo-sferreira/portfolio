@@ -22,36 +22,19 @@ if (scrollProgress) {
   updateProgress();
 }
 
-/* ---------- GLITCH NO HOVER (menu e logo) ---------- */
-const GLITCH_CHARS = "!<>-_\\/[]{}—=+*^?#01";
-function attachGlitch(el) {
-  const original = el.textContent;
-  let frame = null;
-  el.addEventListener("mouseenter", () => {
-    if (frame) cancelAnimationFrame(frame);
-    let iteration = 0;
-    const totalSteps = 10;
-    function step() {
-      el.textContent = original
-        .split("")
-        .map((ch, i) => {
-          if (ch === " ") return " ";
-          const revealAt = (i / original.length) * totalSteps;
-          if (iteration >= revealAt) return original[i];
-          return GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)];
-        })
-        .join("");
-      iteration += 1;
-      if (iteration <= totalSteps) {
-        frame = requestAnimationFrame(() => setTimeout(step, 28));
-      } else {
-        el.textContent = original;
-      }
-    }
-    step();
-  });
+/* ---------- TEXTO QUE ROLA NO HOVER (menu e logo) ---------- */
+function attachRoll(el) {
+  const text = el.textContent.trim();
+  const roll = document.createElement("span");
+  roll.className = "roll";
+  roll.dataset.text = text;
+  const inner = document.createElement("span");
+  inner.textContent = text;
+  roll.appendChild(inner);
+  el.textContent = "";
+  el.appendChild(roll);
 }
-document.querySelectorAll(".navbar nav a:not(.nav-github), .logo").forEach(attachGlitch);
+document.querySelectorAll(".navbar nav a:not(.nav-github), .logo").forEach(attachRoll);
 
 /* ---------- ÍCONES: DESENHO (SVG DRAW-IN) ---------- */
 function prepareDraw(svg) {

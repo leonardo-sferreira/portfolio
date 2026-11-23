@@ -2,111 +2,409 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Leonardo dos Santos | Portfólio jogável</title>
-<meta name="description" content="Portfólio jogável de Leonardo dos Santos, desenvolvedor back-end em formação: crie seu lutador, explore a ilha e abra os projetos nos dojos.">
-<meta property="og:title" content="Leonardo dos Santos | Portfólio jogável">
-<meta property="og:description" content="Crie seu lutador e explore os projetos numa ilha voxel. Prefere ler? Há uma versão clássica.">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Leonardo dos Santos | Portfólio</title>
+<meta name="description" content="Leonardo dos Santos, desenvolvedor back-end em formação. Dois sistemas completos publicados, com APIs, banco de dados, testes e documentação. Buscando estágio ou vaga júnior.">
+<meta property="og:title" content="Leonardo dos Santos | Portfólio">
+<meta property="og:description" content="Desenvolvedor back-end em formação. Dois sistemas completos publicados: ConectaRH e Prioriza.">
 <meta property="og:type" content="website">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230b0d10'/%3E%3Ctext x='50' y='68' font-size='58' font-family='Georgia,serif' font-weight='bold' fill='%232dd4bf' text-anchor='middle'%3EL%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="jogo/jogo.css">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <noscript>
-    <p style="padding:24px;font-family:sans-serif;color:#fff">Este portfólio é um jogo e precisa de JavaScript. <a href="classico.html" style="color:#2dd4bf">Ver a versão clássica →</a></p>
-  </noscript>
+  <div class="scroll-progress" id="scrollProgress"></div>
 
-  <canvas id="game"></canvas>
+  <!-- PRE-LOADER -->
+  <div id="preloader">
+    <canvas id="preloaderCanvas"></canvas>
+    <div class="loader-content">
+      <span class="loader-pct" id="loaderPct">0%</span>
+      <span class="loader-label">Carregando</span>
+    </div>
+  </div>
 
-  <!-- CARREGANDO -->
-  <div id="loading"><span>Montando a arena…</span></div>
+  <!-- NAVBAR -->
+  <header class="navbar">
+    <div class="logo">Leonardo</div>
+    <nav>
+      <a href="#sobre">Sobre</a>
+      <a href="#habilidades">O que faço</a>
+      <a href="#projetos">Projetos</a>
+      <a href="#contato">Contato</a>
+      <a href="https://github.com/leonardo-sferreira" target="_blank" rel="noopener" class="nav-github" aria-label="GitHub"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.65.5.5 5.65.5 12a11.5 11.5 0 007.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.37-3.87-1.37-.53-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 015.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.84 1.19 3.1 0 4.42-2.69 5.39-5.26 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0023.5 12C23.5 5.65 18.35.5 12 .5z"/></svg></a>
+    </nav>
+  </header>
 
-  <!-- CRIAR PERSONAGEM -->
-  <section id="creator" class="hidden" aria-label="Criar personagem">
-    <div class="creator-card">
-      <p class="kicker">Portfólio jogável</p>
-      <h1>Leonardo<br>Arena</h1>
-      <p class="intro">Crie seu lutador e explore a ilha. Cada dojo guarda um projeto: acerte o totem para abrir.</p>
-
-      <label class="field">
-        <span>Nome do lutador</span>
-        <input id="fighterName" maxlength="14" placeholder="Visitante" autocomplete="off">
-      </label>
-
-      <div class="field"><span>Pele</span><div class="swatches" data-opt="skin"></div></div>
-      <div class="field"><span>Cabelo</span><div class="chips" data-opt="hair"></div></div>
-      <div class="field"><span>Cor do cabelo</span><div class="swatches" data-opt="hairColor"></div></div>
-      <div class="field"><span>Roupa</span><div class="chips" data-opt="outfit"></div></div>
-      <div class="field"><span>Cor da roupa</span><div class="swatches" data-opt="outfitColor"></div></div>
-      <div class="field"><span>Faixa</span><div class="swatches" data-opt="band"></div></div>
-
-      <div class="creator-actions">
-        <button id="randomBtn" type="button" class="btn ghost">Aleatório</button>
-        <button id="startBtn" type="button" class="btn primary">Lutar!</button>
+  <!-- HERO -->
+  <section class="hero" id="topo">
+    <canvas class="hero-canvas" id="heroCanvas"></canvas>
+    <div class="hero-content">
+      <p class="hero-sub reveal">Desenvolvedor Back-end em formação</p>
+      <h1 class="split-text">Leonardo dos Santos</h1>
+      <p class="hero-value reveal" style="--delay:0.14s">Construo sistemas que resolvem problemas reais, da regra de negócio ao deploy. Já entreguei dois sistemas completos e estou buscando <strong>estágio ou vaga júnior</strong> em back-end.</p>
+      <p class="hero-role reveal" style="--delay:0.2s">
+        <span class="role-pill"><span class="role-dot"></span><span id="roleText">Back-end e APIs</span></span>
+      </p>
+      <div class="hero-actions reveal" style="--delay:0.24s">
+        <a href="#projetos" class="btn-primary">Ver projetos</a>
+        <a href="#contato" class="btn-secondary">Fale comigo</a>
       </div>
-      <a class="classic-link" href="classico.html">Prefere ler? Ver a versão clássica →</a>
+    </div>
+    <div class="hero-scroll">
+      <span></span>
     </div>
   </section>
 
-  <!-- HUD -->
-  <div id="hud" class="hidden">
-    <div class="hud-player">
-      <span class="hud-name" id="hudName">Visitante</span>
-      <div class="hud-bar"><i id="hudBar"></i></div>
-      <span class="hud-sub">vs. Portfólio do Leonardo</span>
-      <button type="button" class="hud-edit" id="editBtn">Editar lutador <kbd>C</kbd></button>
+  <!-- NÚMEROS -->
+  <section class="stats" id="stats">
+    <div class="stats-grid">
+      <div class="stat-item reveal">
+        <span class="stat-number" data-count="4">0</span>
+        <span class="stat-label">projetos no portfólio</span>
+      </div>
+      <div class="stat-item reveal" style="--delay:0.08s">
+        <span class="stat-number" data-count="2">0</span>
+        <span class="stat-label">sistemas completos publicados, com documentação</span>
+      </div>
+      <div class="stat-item reveal" style="--delay:0.16s">
+        <span class="stat-number" data-count="14">0</span>
+        <span class="stat-label">tecnologias e ferramentas usadas nos projetos</span>
+      </div>
     </div>
+  </section>
 
-    <div class="hud-quests" id="quests">
-      <strong>Missões <em id="questCount">0/6</em></strong>
-      <ul id="questList"></ul>
-    </div>
-
-    <a class="hud-classic" href="classico.html">Versão clássica</a>
-
-    <div class="hud-help" id="help">
-      <span><kbd>WASD</kbd> andar</span>
-      <span><kbd>Shift</kbd> correr</span>
-      <span><kbd>Espaço</kbd> pular</span>
-      <span><kbd>J</kbd> ou <kbd>clique</kbd> soco</span>
-      <span><kbd>K</kbd> ou <kbd>botão direito</kbd> chute</span>
-      <span><kbd>E</kbd> abrir</span>
-      <span><kbd>M</kbd> som</span>
-    </div>
-
-    <div class="prompt hidden" id="prompt"></div>
-  </div>
-
-  <!-- TEXTOS FLUTUANTES -->
-  <div id="floaters"></div>
-
-  <!-- CONTROLES DE TOQUE -->
-  <div id="touch" class="hidden">
-    <div class="stick" id="stick"><i id="stickKnob"></i></div>
-    <div class="touch-buttons">
-      <button type="button" data-act="interact">E</button>
-      <button type="button" data-act="jump">Pular</button>
-      <button type="button" data-act="kick">Chute</button>
-      <button type="button" data-act="punch" class="big">Soco</button>
+  <!-- MARQUEE DE TECNOLOGIAS -->
+  <div class="tech-marquee" aria-hidden="true">
+    <div class="marquee-track">
+      <span>Python</span><span>SQL</span><span>PostgreSQL</span><span>Xano</span><span>APIs REST</span><span>Supabase</span><span>Streamlit</span><span>Reflex</span><span>pytest</span><span>GitHub Actions</span><span>OpenSpec</span><span>Figma</span><span>n8n</span><span>Telegram Bot API</span>
+      <span>Python</span><span>SQL</span><span>PostgreSQL</span><span>Xano</span><span>APIs REST</span><span>Supabase</span><span>Streamlit</span><span>Reflex</span><span>pytest</span><span>GitHub Actions</span><span>OpenSpec</span><span>Figma</span><span>n8n</span><span>Telegram Bot API</span>
     </div>
   </div>
 
-  <!-- PAINEL DE CONTEÚDO -->
-  <div id="panel" class="hidden" role="dialog" aria-modal="true" aria-labelledby="panelTitle">
-    <div class="panel-card">
-      <button type="button" class="panel-close" id="panelClose" aria-label="Fechar">✕</button>
-      <div id="panelBody"></div>
+  <!-- SOBRE -->
+  <section class="sobre" id="sobre">
+    <span class="section-tag reveal">Quem sou eu</span>
+    <h2 class="split-text">Sobre mim</h2>
+    <div class="sobre-texto reveal" style="--delay:0.1s">
+      <p class="sobre-lead">Sou desenvolvedor back-end em formação e gosto da parte que fica por trás da tela: <strong>regras de negócio, APIs e banco de dados</strong>. Estou buscando <strong>estágio ou vaga júnior em back-end</strong>.</p>
+      <div class="sobre-bloco">
+        <h3>Onde estou hoje</h3>
+        <p>Sou <strong>Analista de Backoffice N2 na Loft</strong>. Trabalhando com os processos e sistemas por trás da operação, vejo de perto onde eles travam o trabalho. Foi assim que entrei em projetos internos técnicos, como a melhoria do bot de atendimento, e decidi migrar para desenvolvimento.</p>
+      </div>
+      <div class="sobre-bloco">
+        <h3>Como eu trabalho</h3>
+        <p>Especifico antes de codar, deixo cada decisão registrada e só considero pronto o que tem teste e documentação. Foi assim que entreguei o ConectaRH e o Prioriza na <strong>Impacta</strong>, onde curso Sistemas de Informação.</p>
+      </div>
+      <div class="sobre-bloco">
+        <h3>O que procuro</h3>
+        <p>Um time onde eu possa aprender com gente mais experiente e entregar desde o começo.</p>
+      </div>
+    </div>
+    <ul class="sobre-fatos reveal" style="--delay:0.18s">
+      <li><span>Formação</span>Sistemas de Informação · Impacta <em>(em andamento)</em></li>
+      <li><span>Hoje</span>Analista de Backoffice N2 · Loft</li>
+      <li><span>Foco</span>Back-end, APIs e banco de dados</li>
+    </ul>
+  </section>
+
+  <!-- SERVIÇOS (scroll pinado) -->
+  <section class="servicos" id="habilidades">
+    <span class="section-tag reveal">Habilidades</span>
+    <h2 class="split-text">O que eu faço</h2>
+
+    <div class="scrolly" id="scrolly">
+      <div class="scrolly-sticky" id="stickyBox">
+
+        <div class="scrolly-text">
+          <div class="stage-copy active" data-stage="0">
+            <span class="eyebrow">01 · Back-end e APIs</span>
+            <h3>Regra de negócio no servidor</h3>
+            <p>APIs REST com login em duas etapas, perfis de acesso e autorização conferida em todo endpoint. No ConectaRH são 316 endpoints, e o CI barra qualquer um que esqueça a checagem de acesso.</p>
+            <ul class="projeto-tags"><li>Xano</li><li>APIs REST</li><li>Python</li><li>OTP</li></ul>
+          </div>
+          <div class="stage-copy" data-stage="1">
+            <span class="eyebrow">02 · Banco de Dados</span>
+            <h3>Modelagem que guarda a história</h3>
+            <p>Modelos relacionais pensados para auditoria: 80 tabelas no ConectaRH e 23 no Prioriza, com histórico imutável. Nada que tenha histórico é apagado, só desativado.</p>
+            <ul class="projeto-tags"><li>PostgreSQL</li><li>SQL</li><li>Modelagem</li><li>Supabase</li></ul>
+          </div>
+          <div class="stage-copy" data-stage="2">
+            <span class="eyebrow">03 · Qualidade</span>
+            <h3>Especifico, testo e documento</h3>
+            <p>Cada funcionalidade passa por especificação no OpenSpec antes do código. No Prioriza são 486 testes catalogados; no ConectaRH, 52 verificações automáticas a cada Pull Request.</p>
+            <ul class="projeto-tags"><li>OpenSpec</li><li>pytest</li><li>GitHub Actions</li><li>CI</li></ul>
+          </div>
+          <div class="stage-copy" data-stage="3">
+            <span class="eyebrow">04 · Automações</span>
+            <h3>Tarefa repetitiva vira script</h3>
+            <p>O Bot de Finanças registra meus gastos a partir de uma mensagem no Telegram, avisa contas que vencem e fecha o mês sozinho. Também uso n8n e Make para integrar ferramentas.</p>
+            <ul class="projeto-tags"><li>Python</li><li>Telegram Bot API</li><li>Notion API</li><li>n8n</li></ul>
+          </div>
+        </div>
+
+        <div class="scrolly-visual">
+          <svg class="ring-svg" viewBox="0 0 160 160">
+            <circle class="ring-bg" cx="80" cy="80" r="74"/>
+            <circle class="ring-fill" id="ringFill" cx="80" cy="80" r="74"/>
+          </svg>
+
+          <svg class="stage-icon active" data-stage="0" viewBox="0 0 120 120" fill="none">
+            <rect x="14" y="22" width="92" height="64" rx="8" stroke="currentColor" stroke-width="3"/>
+            <path d="M14 38h92" stroke="currentColor" stroke-width="3"/>
+            <circle cx="24" cy="30" r="2.5" fill="currentColor"/>
+            <circle cx="33" cy="30" r="2.5" fill="currentColor"/>
+            <circle cx="42" cy="30" r="2.5" fill="currentColor"/>
+            <path d="M44 56l-12 10 12 10M76 56l12 10-12 10M64 52l-8 28" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+
+          <svg class="stage-icon" data-stage="1" viewBox="0 0 120 120" fill="none">
+            <ellipse cx="60" cy="30" rx="34" ry="12" stroke="currentColor" stroke-width="3"/>
+            <path d="M26 30v24c0 6.6 15.2 12 34 12s34-5.4 34-12V30" stroke="currentColor" stroke-width="3"/>
+            <path d="M26 54v24c0 6.6 15.2 12 34 12s34-5.4 34-12V54" stroke="currentColor" stroke-width="3"/>
+          </svg>
+
+          <svg class="stage-icon" data-stage="2" viewBox="0 0 120 120" fill="none">
+            <path d="M60 14l36 14v28c0 24-16 40-36 50-20-10-36-26-36-50V28z" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>
+            <path d="M44 60l11 11 22-24" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+
+          <svg class="stage-icon" data-stage="3" viewBox="0 0 120 120" fill="none">
+            <circle cx="42" cy="42" r="14" stroke="currentColor" stroke-width="3"/>
+            <circle cx="80" cy="78" r="14" stroke="currentColor" stroke-width="3"/>
+            <path d="M42 56v10a8 8 0 0 0 8 8h18M68 78h2" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+            <path d="M56 70l6 4-6 4" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M58 36h24M70 24v24" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-dasharray="1 7"/>
+          </svg>
+        </div>
+
+        <div class="scrolly-rail" id="rail">
+          <div class="rail-dot active" data-stage="0"></div>
+          <div class="rail-dot" data-stage="1"></div>
+          <div class="rail-dot" data-stage="2"></div>
+          <div class="rail-dot" data-stage="3"></div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJETOS / TRAJETÓRIA -->
+  <section class="trajetoria" id="projetos">
+    <span class="section-tag reveal">Trabalhos</span>
+    <h2 class="split-text">Minha trajetória</h2>
+    <p class="trajetoria-intro reveal">Quatro projetos, do acadêmico ao pessoal, cobrindo web, mobile, automação e banco de dados.</p>
+
+    <div class="trajetoria-layout">
+
+      <aside class="trajetoria-nav">
+        <div class="traj-path">
+          <div class="path-line" style="left:14px; top:14px; width:70.7px; transform:rotate(64.9deg);"></div>
+          <div class="path-line" style="left:44px; top:78px; width:70.7px; transform:rotate(115.1deg);"></div>
+          <div class="path-line" style="left:14px; top:142px; width:70.7px; transform:rotate(64.9deg);"></div>
+
+          <a href="#proj-01" class="path-item active" data-target="proj-01" style="top:0; left:0; --n-accent:#2dd4bf">
+            <span class="path-diamond"><span>01</span></span>
+            <span class="path-label">Fila Prioritária</span>
+          </a>
+          <a href="#proj-02" class="path-item" data-target="proj-02" style="top:64px; left:30px; --n-accent:#4f8ff0">
+            <span class="path-diamond"><span>02</span></span>
+            <span class="path-label">ConectaRH</span>
+          </a>
+          <a href="#proj-03" class="path-item" data-target="proj-03" style="top:128px; left:0; --n-accent:#22d3ee">
+            <span class="path-diamond"><span>03</span></span>
+            <span class="path-label">Sabor Local</span>
+          </a>
+          <a href="#proj-04" class="path-item" data-target="proj-04" style="top:192px; left:30px; --n-accent:#f2c14e">
+            <span class="path-diamond"><span>04</span></span>
+            <span class="path-label">Bot de Finanças</span>
+          </a>
+        </div>
+      </aside>
+
+      <div class="trajetoria-content">
+
+        <article class="traj-case reveal" id="proj-01" data-accent="teal">
+          <span class="traj-eyebrow">Finalizado · Projeto acadêmico (Impacta)</span>
+          <h3>Fila Prioritária — Pronto-Socorro</h3>
+          <div class="traj-body">
+            <div class="traj-media" data-project="proj-01" role="button" tabindex="0" aria-label="Ver case completo de Fila Prioritária">
+              <div class="device-bar"><span></span><span></span><span></span></div>
+              <div class="device-viewport"><img src="assets/projetos/ps-fila-painel.png" alt="Painel de chamadas do sistema de fila prioritária para pronto-socorro"></div>
+              <span class="media-zoom-hint">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M9 11h4M11 9v4"/></svg>
+              </span>
+            </div>
+            <div class="traj-text">
+              <ul class="traj-bullets">
+                <li>Classifica cada paciente em Vermelha, Amarela ou Azul somando sintomas e sinais vitais — não é só ordem de chegada.</li>
+                <li>Direciona a ficha pra especialidade certa e distribui pro médico elegível, sem escolha manual.</li>
+                <li>Painel público mostra senha e sala, nunca nome ou CPF.</li>
+              </ul>
+              <ul class="projeto-tags"><li>Reflex</li><li>Xano</li><li>OpenSpec</li></ul>
+              <div class="traj-actions">
+                <a href="https://github.com/leonardo-sferreira/ps-fila-prioritaria" target="_blank" rel="noopener" class="projeto-link">Ver repositório →</a>
+                <a href="https://leonardo-sferreira.github.io/ps-fila-prioritaria/" target="_blank" rel="noopener" class="projeto-link">Ver documentação →</a>
+                <button type="button" class="btn-case" data-project="proj-01">Ver case completo</button>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="traj-case reveal" id="proj-02" data-accent="blue">
+          <span class="traj-eyebrow">Finalizado · Projeto acadêmico</span>
+          <h3>ConectaRH</h3>
+          <div class="traj-body">
+            <div class="traj-media" data-project="proj-02" role="button" tabindex="0" aria-label="Ver case completo de ConectaRH">
+              <div class="device-bar"><span></span><span></span><span></span></div>
+              <div class="device-viewport"><img src="assets/projetos/conectarh-inicio.png" alt="Tela inicial do ConectaRH, plataforma de gestão de pessoas"></div>
+              <span class="media-zoom-hint">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M9 11h4M11 9v4"/></svg>
+              </span>
+            </div>
+            <div class="traj-text">
+              <ul class="traj-bullets">
+                <li>Centraliza ponto, férias, documentos e desligamento num só lugar, com quatro perfis de acesso.</li>
+                <li>Motor de regras trabalhistas aplica a matriz certa por tipo de contrato (CLT, estágio, PJ...).</li>
+                <li>Toda decisão relevante fica auditada: quem fez, o quê, quando e por quê.</li>
+              </ul>
+              <ul class="projeto-tags"><li>Streamlit</li><li>Xano</li><li>Supabase</li></ul>
+              <div class="traj-actions">
+                <a href="https://github.com/leonardo-sferreira/conectahr" target="_blank" rel="noopener" class="projeto-link">Ver repositório →</a>
+                <a href="https://leonardo-sferreira.github.io/conectahr/" target="_blank" rel="noopener" class="projeto-link">Ver documentação →</a>
+                <button type="button" class="btn-case" data-project="proj-02">Ver case completo</button>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="traj-case reveal" id="proj-03" data-accent="cyan">
+          <span class="traj-eyebrow">Protótipo · Projeto acadêmico</span>
+          <h3>Sabor Local</h3>
+          <div class="traj-body">
+            <div class="traj-media" data-project="proj-03" role="button" tabindex="0" aria-label="Ver case completo de Sabor Local">
+              <div class="device-bar"><span></span><span></span><span></span></div>
+              <div class="device-viewport"><img src="assets/projetos/sabor-local-home.png" alt="Tela inicial do app de delivery Sabor Local, com cardápio e categorias"></div>
+              <span class="media-zoom-hint">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M9 11h4M11 9v4"/></svg>
+              </span>
+            </div>
+            <div class="traj-text">
+              <ul class="traj-bullets">
+                <li>Login, cardápio por categoria, carrinho e pagamento pensados pra experiência tipo iFood.</li>
+                <li>Acompanhamento do pedido com mapa em tempo real.</li>
+                <li>Protótipo navegável completo no Figma, telas organizadas por fluxo.</li>
+              </ul>
+              <ul class="projeto-tags"><li>Figma</li><li>FlutterFlow</li><li>UX/UI</li></ul>
+              <div class="traj-actions">
+                <a href="https://www.figma.com/design/iRn8igu0iCwyqYTathrz9P/Sabor-local?node-id=0-1" target="_blank" rel="noopener" class="projeto-link">Ver protótipo →</a>
+                <button type="button" class="btn-case" data-project="proj-03">Ver case completo</button>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="traj-case reveal" id="proj-04" data-accent="gold">
+          <span class="traj-eyebrow">Em uso pessoal · Repositório privado</span>
+          <h3>Bot de Finanças</h3>
+          <div class="traj-body">
+            <div class="traj-media traj-media--diagram" data-project="proj-04" role="button" tabindex="0" aria-label="Ver case completo de Bot de Finanças">
+              <div class="device-bar"><span></span><span></span><span></span></div>
+              <span class="media-zoom-hint">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M9 11h4M11 9v4"/></svg>
+              </span>
+              <div class="device-viewport">
+                <svg class="diagram-icon is-accent" viewBox="0 0 48 48" fill="none">
+                  <circle cx="24" cy="24" r="20" stroke="currentColor" stroke-width="2.5"/>
+                  <path d="M33 15L13.5 23.3c-1 .4-1 1 0 1.4l5.3 1.8 2 6c.3.9 1 1 1.4.2l2.6-4.6M33 15L19.8 26.5M33 15l-4 15.5c-.2.9-.9 1-1.4.3l-4-5.3"
+                        stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>
+                </svg>
+                <svg class="diagram-arrow" viewBox="0 0 48 14" fill="none">
+                  <path d="M0 7h42M34 1l7 6-7 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <svg class="diagram-icon" viewBox="0 0 48 48" fill="none">
+                  <rect x="8" y="6" width="32" height="36" rx="4" stroke="currentColor" stroke-width="2.5"/>
+                  <path d="M8 18h32M20 18v24" stroke="currentColor" stroke-width="2.5"/>
+                  <circle cx="14" cy="12" r="1.6" fill="currentColor"/>
+                </svg>
+              </div>
+            </div>
+            <div class="traj-text">
+              <ul class="traj-bullets">
+                <li>Registra gasto, recebimento, fatura, investimento e empréstimo direto pelo Telegram.</li>
+                <li>Lança recorrentes sozinho e avisa fatura e parcela que vence em 3 dias.</li>
+                <li>Fecha o mês automaticamente: entradas, saídas, resultado e orçamento estourado.</li>
+              </ul>
+              <ul class="projeto-tags"><li>Python</li><li>Telegram Bot API</li><li>Notion API</li></ul>
+              <div class="traj-actions">
+                <span class="projeto-link projeto-link--static">Código fonte privado</span>
+                <button type="button" class="btn-case" data-project="proj-04">Ver case completo</button>
+              </div>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- MODAL: CASE COMPLETO -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <button type="button" class="modal-close" id="modalClose" aria-label="Fechar">✕</button>
+
+      <div class="modal-gallery" id="modalGallery">
+        <button type="button" class="modal-nav prev" id="galPrev" aria-label="Imagem anterior">‹</button>
+        <img id="modalImg" src="" alt="">
+        <button type="button" class="modal-nav next" id="galNext" aria-label="Próxima imagem">›</button>
+        <div class="modal-dots" id="galDots"></div>
+      </div>
+
+      <div class="modal-body">
+        <span class="modal-category" id="modalCategory"></span>
+        <h3 id="modalTitle"></h3>
+        <div class="modal-role">
+          <strong>Função &amp; desafio</strong>
+          <p id="modalRole"></p>
+        </div>
+        <div class="modal-desc" id="modalDesc"></div>
+        <div class="modal-extra" id="modalDecisions"><strong>Decisões que tomei</strong><ul></ul></div>
+        <div class="modal-extra" id="modalLessons"><strong>O que aprendi</strong><ul></ul></div>
+        <ul class="projeto-tags" id="modalTags"></ul>
+        <a href="#" class="projeto-link" id="modalLink" target="_blank" rel="noopener">Ver repositório →</a>
+      </div>
     </div>
   </div>
 
-  <!-- AVISO -->
-  <div id="toast" class="hidden"></div>
+  <!-- CONTATO -->
+  <section class="contato" id="contato">
+    <span class="section-tag reveal">Vamos conversar</span>
+    <h2 class="split-text">Contato</h2>
+    <p class="reveal" style="--delay:0.08s">Estou buscando estágio ou vaga júnior em back-end. Se a sua equipe tem uma vaga, ou se quiser trocar uma ideia sobre algum projeto, me chama.</p>
+    <div class="contato-actions reveal" style="--delay:0.16s">
+      <a href="mailto:leonardoferreira0409@gmail.com" class="btn-primary">Enviar e-mail</a>
+      <a href="https://www.linkedin.com/in/ferreirasantosleonardo" class="btn-secondary" id="linkedinLink" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5C4.98 4.88 3.88 6 2.5 6S0 4.88 0 3.5 1.1 1 2.48 1 4.98 2.12 4.98 3.5zM.5 8h4V23h-4V8zm7.5 0h3.8v2.05h.05c.53-1 1.84-2.05 3.78-2.05 4.04 0 4.78 2.66 4.78 6.12V23h-4v-6.9c0-1.65-.03-3.78-2.3-3.78-2.3 0-2.65 1.8-2.65 3.66V23h-4V8z"/></svg>
+        LinkedIn
+      </a>
+      <a href="https://github.com/leonardo-sferreira" class="btn-secondary" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.65.5.5 5.65.5 12a11.5 11.5 0 007.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.87-1.37-3.87-1.37-.53-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 015.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.84 1.19 3.1 0 4.42-2.69 5.39-5.26 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0023.5 12C23.5 5.65 18.35.5 12 .5z"/></svg>
+        GitHub
+      </a>
+      <a href="assets/CV-Leonardo-dos-Santos.pdf" class="btn-secondary" download="CV-Leonardo-dos-Santos.pdf">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4"/><path d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>
+        Baixar CV
+      </a>
+    </div>
+  </section>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script src="jogo/jogo.js"></script>
+  <footer>
+    <p>&copy; <span id="ano"></span> Leonardo dos Santos. Todos os direitos reservados.</p>
+  </footer>
+
+  <script src="script.js"></script>
 </body>
 </html>

@@ -8,7 +8,7 @@
 (() => {
   "use strict";
 
-  const CLASSIC_URL = "https://leonardo-sferreira.github.io/portfolio/classico.html";
+  const CLASSIC_URL = "https://leonardo-sferreira.github.io/portfolio/";
 
   /* Plano B: sem WebGL ou sem a biblioteca 3D, vai para a versão clássica. */
   function webglOK() {
@@ -1249,7 +1249,7 @@
     <div class="panel-content">
       <p class="panel-kicker">Quem é o Leonardo</p>
       <h2 id="panelTitle">Sobre mim</h2>
-      <p>Comecei em tecnologia pelo atendimento. Como analista na <strong>Loft</strong>, passo o dia perto de quem usa o sistema e vejo onde ele atrapalha. Foi assim que entrei em projetos internos técnicos e decidi migrar para desenvolvimento.</p>
+      <p>Sou <strong>Analista de Backoffice N2 na Loft</strong> e vejo de perto onde os sistemas travam a operação. Foi assim que entrei em projetos internos técnicos e decidi migrar para desenvolvimento.</p>
       <p>Curso <strong>Sistemas de Informação na Impacta</strong> e gosto da parte que fica por trás da tela: <strong>regras de negócio, APIs e modelagem de dados</strong>. Especifico antes de codar, registro cada decisão e só considero pronto o que tem teste e documentação.</p>
       <p>Estou buscando <strong>estágio ou vaga júnior em back-end</strong>.</p>
       <div class="panel-stats"><span>Python</span><span>SQL</span><span>APIs REST</span><span>Xano</span><span>OpenSpec</span></div>

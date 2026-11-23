@@ -133,15 +133,34 @@ h1, h2, h3 { font-family: var(--font-head); }
 }
 .navbar nav a:hover { color: var(--text); }
 .navbar nav a:hover::after { width: 100%; }
-.navbar nav { align-items: center; }
-.navbar nav a.nav-game {
-  color: var(--accent);
-  border: 1px solid rgba(45,212,191,0.4);
-  border-radius: 999px;
-  padding: 4px 12px;
+
+/* Texto que rola no hover: o texto sobe e a cópia em destaque entra por baixo */
+.roll {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
 }
-.navbar nav a.nav-game::after { display: none; }
-.navbar nav a.nav-game:hover { color: #06201c; background: var(--accent); }
+.roll > span,
+.roll::after {
+  display: block;
+  transition: transform 0.45s cubic-bezier(.2,.8,.2,1);
+}
+.roll::after {
+  content: attr(data-text);
+  position: absolute;
+  left: 0; top: 100%;
+  color: var(--accent-light);
+}
+.logo { cursor: default; }
+.logo .roll, .logo .roll > span { color: var(--text); }
+.navbar nav a:hover .roll > span,
+.navbar nav a:hover .roll::after,
+.navbar nav a:focus-visible .roll > span,
+.navbar nav a:focus-visible .roll::after,
+.logo:hover .roll > span,
+.logo:hover .roll::after { transform: translateY(-100%); }
+.navbar nav { align-items: center; }
 .navbar nav a.nav-github { display: inline-flex; }
 .navbar nav a.nav-github::after { display: none; }
 .navbar nav a.nav-github svg { width: 18px; height: 18px; }
@@ -364,11 +383,31 @@ h2 {
 .sobre-texto { text-align: left; }
 .sobre-texto p { margin-bottom: 16px; line-height: 1.7; }
 .sobre-texto strong { color: var(--text); font-weight: 600; }
+.sobre-texto p.sobre-lead {
+  font-size: 1.2rem;
+  line-height: 1.6;
+  color: var(--text);
+  margin-bottom: 28px;
+}
+.sobre-bloco {
+  border-left: 2px solid rgba(45,212,191,0.35);
+  padding-left: 18px;
+  margin-bottom: 22px;
+}
+.sobre-bloco h3 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.78rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--accent-light);
+  margin-bottom: 6px;
+}
+.sobre-bloco p { margin-bottom: 0; }
 
 .sobre-fatos {
   list-style: none;
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
   margin-top: 28px;
   text-align: left;

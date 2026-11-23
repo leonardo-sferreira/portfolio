@@ -1,0 +1,5 @@
+# O portfólio jogável (pasta jogo/) está desativado: o código fica no repositório,
+# mas não é publicado no GitHub Pages. Para reativar, remova "jogo" da lista abaixo.
+exclude:
+  - jogo
+  - README.md
