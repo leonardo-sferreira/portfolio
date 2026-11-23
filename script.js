@@ -455,8 +455,9 @@ const PROJECTS = {
     desc: [
       "O ConectaRH nasceu pra tirar RH, gestores e colaboradores das planilhas e do e-mail — um lugar só para ponto, férias, documentos e desligamento, onde cada perfil vê só o que pode ver.",
       "Toda decisão importante (aprovar férias, corrigir ponto, mudar um dado cadastral) fica registrada: quem fez, quando e por quê.",
+      "Projeto finalizado e publicado: as 40 entregas planejadas foram concluídas, testadas e arquivadas. O app está no ar, com contas de demonstração para os quatro perfis, manual do usuário e documentação técnica.",
     ],
-    tech: "Por trás da tela: backend com 59 tabelas e 228 endpoints no Xano, frontend com 22 telas em Streamlit, e 909 verificações automatizadas rodando a cada Pull Request.",
+    tech: "Por trás da tela: 55 telas em Streamlit, backend no Xano com 80 tabelas e 316 endpoints, arquivos no Supabase e 52 verificações automatizadas no CI a cada Pull Request.",
     images: [
       { src: "assets/projetos/conectarh-inicio.png", alt: "Tela inicial do ConectaRH" },
       { src: "assets/projetos/conectarh-perfil.png", alt: "Tela de perfil do colaborador" },
