@@ -649,7 +649,8 @@
       const s = toScreen(p);
       const dist = Math.hypot(p.x - player.pos.x, p.z - player.pos.z);
       const far = dist > l.maxDist || dist < (l.minDist || 0);
-      l.el.style.display = s.visible && !far ? "" : "none";
+      const underHud = s.y > window.innerHeight - 110 || s.y < 70;
+      l.el.style.display = s.visible && !far && !underHud ? "" : "none";
       l.el.style.left = s.x + "px";
       l.el.style.top = s.y + "px";
     }
@@ -715,14 +716,19 @@
     kick: ["KeyK"],
     edit: ["KeyC"],
     mute: ["KeyM"],
+    interact: ["KeyE"],
   };
   const held = (action) => CODES[action].some((c) => keys.has(c));
   let jumpQueued = false;
   let attackQueued = null;
-  let mode = "creator"; // "creator" | "play"
+  let mode = "creator"; // "creator" | "play" | "panel"
 
   window.addEventListener("keydown", (e) => {
     if (e.target && e.target.tagName === "INPUT") return;
+    if (mode === "panel") {
+      if (e.code === "Escape") closePanel();
+      return;
+    }
     if (mode !== "play") return;
     const code = e.code;
     if (Object.values(CODES).flat().includes(code)) e.preventDefault();
@@ -732,10 +738,21 @@
       if (CODES.kick.includes(code)) attackQueued = "kick";
       if (CODES.edit.includes(code)) openCreator();
       if (CODES.mute.includes(code)) toggleMute();
+      if (CODES.interact.includes(code)) interact();
     }
     keys.add(code);
   });
   window.addEventListener("keyup", (e) => keys.delete(e.code));
+
+  /* Mouse: clique esquerdo = soco, clique direito = chute (só dentro do jogo, não nos botões da tela). */
+  canvas.addEventListener("mousedown", (e) => {
+    if (mode !== "play") return;
+    if (e.button === 0) attackQueued = "punch";
+    else if (e.button === 2) attackQueued = "kick";
+    else return;
+    e.preventDefault();
+  });
+  canvas.addEventListener("contextmenu", (e) => e.preventDefault());
   window.addEventListener("blur", () => keys.clear());
   canvas.addEventListener("wheel", (e) => {
     e.preventDefault();
@@ -1014,6 +1031,13 @@
       t.material.opacity = lerp(t.material.opacity, blocking ? 0.22 : 1, damp(8, dt));
       t.material.depthWrite = t.material.opacity > 0.95;
     }
+    for (const f of (typeof fadeables !== "undefined" ? fadeables : [])) {
+      const u = clamp(((f.x - px) * vx + (f.z - pz) * vz) / len2, 0, 1);
+      const dx = px + vx * u - f.x, dz = pz + vz * u - f.z;
+      const blocking = mode === "play" && u > 0.02 && u < 0.85 && Math.hypot(dx, dz) < f.radius;
+      f.opacity = lerp(f.opacity, blocking ? 0.25 : 1, damp(8, dt));
+      for (const m of f.mats) { m.opacity = f.opacity; m.depthWrite = f.opacity > 0.95; }
+    }
   }
 
   /* =========================================================
@@ -1104,18 +1128,364 @@
   updateName();
 
   /* =========================================================
+     PORTFÓLIO NO MAPA (bloco 4)
+     ========================================================= */
+  const LINKS = {
+    email: "mailto:leonardoferreira0409@gmail.com",
+    linkedin: "https://www.linkedin.com/in/ferreirasantosleonardo",
+    github: "https://github.com/leonardo-sferreira",
+    cv: "../assets/CV-Leonardo-dos-Santos.pdf",
+    classic: "https://leonardo-sferreira.github.io/portfolio/",
+  };
+
+  const PROJECTS = {
+    "proj-01": {
+      num: "01", title: "PS Fila Prioritária", short: "Fila Prioritária",
+      kicker: "Engenharia de Software · Saúde", status: "Finalizado · Projeto acadêmico (Impacta)",
+      role: "Product Owner: defini as regras de priorização clínica, prototipei as telas, modelei o banco e validei as entregas.",
+      desc: [
+        "Fila de pronto-socorro que chama primeiro <strong>quem está pior</strong>, não quem chegou antes.",
+        "Classifica cada paciente em Vermelha, Amarela ou Azul por sintomas e sinais vitais, direciona a ficha à especialidade certa e mostra as chamadas num painel público sem nome nem CPF. O sistema ganhou o nome de Prioriza.",
+      ],
+      stats: ["33 telas", "71 endpoints", "23 tabelas", "486 testes"],
+      tags: ["Reflex", "Xano", "pytest", "OpenSpec"],
+      img: "ps-fila-painel.png",
+      links: [["Documentação", "https://leonardo-sferreira.github.io/ps-fila-prioritaria/", true], ["Código", "https://github.com/leonardo-sferreira/ps-fila-prioritaria"]],
+    },
+    "proj-02": {
+      num: "02", title: "ConectaRH", short: "ConectaRH",
+      kicker: "Engenharia de Software · RH", status: "Finalizado e publicado · Projeto acadêmico",
+      role: "Participei do desenho das regras de negócio e do modelo de dados, além de construir boa parte das telas em Streamlit e a integração com o backend em Xano.",
+      desc: [
+        "Plataforma de RH que tira <strong>ponto, férias, documentos e desligamento</strong> das planilhas e do e-mail.",
+        "Quatro perfis de acesso, motor de regras trabalhistas por tipo de contrato, LGPD e auditoria de cada decisão: quem fez, o quê, quando e por quê.",
+      ],
+      stats: ["55 telas", "316 endpoints", "80 tabelas", "52 checks no CI"],
+      tags: ["Streamlit", "Xano", "Supabase", "Brevo"],
+      img: "conectarh-inicio.png",
+      links: [["Documentação", "https://leonardo-sferreira.github.io/conectahr/", true], ["Código", "https://github.com/leonardo-sferreira/conectahr"]],
+    },
+    "proj-03": {
+      num: "03", title: "Sabor Local", short: "Sabor Local",
+      kicker: "UX/UI · Prototipação", status: "Protótipo · Projeto acadêmico",
+      role: "Design de ponta a ponta no Figma: fluxos, telas e protótipo navegável.",
+      desc: [
+        "Delivery de comida mineira pensado nos <strong>dois lados da operação</strong>: o app do cliente e o painel do restaurante.",
+        "Cardápio, carrinho, cupom, pagamento e pedido no mapa; no painel, pedidos, relatórios, chat, cupons e produtos.",
+      ],
+      stats: ["~75 telas no app", "22 telas no painel"],
+      tags: ["Figma", "FlutterFlow", "UX/UI"],
+      img: "sabor-local-home.png",
+      links: [["Protótipo no Figma", "https://www.figma.com/design/iRn8igu0iCwyqYTathrz9P/Sabor-local?node-id=0-1", true], ["Telas", "https://github.com/leonardo-sferreira/SaborLocal-Figma"]],
+    },
+    "proj-04": {
+      num: "04", title: "Bot de Finanças", short: "Bot de Finanças",
+      kicker: "Automação · Uso pessoal", status: "Em uso pessoal · Repositório privado",
+      role: "Projetei e implementei sozinho, do fluxo de conversa no Telegram até a integração com o Notion.",
+      desc: [
+        "Transforma uma mensagem curta, como <strong>“45,90 almoço”</strong>, num lançamento organizado no Notion.",
+        "Lança recorrentes sozinho, avisa faturas e parcelas que vencem em 3 dias, manda resumo semanal e fecha o mês.",
+      ],
+      stats: [],
+      tags: ["Python", "Telegram Bot API", "Notion API"],
+      img: null,
+      links: [],
+    },
+  };
+
+  /* ---------- painel de conteúdo ---------- */
+  const panelEl = $("panel");
+  const panelBody = $("panelBody");
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const linkHtml = ([text, href, main]) =>
+    `<a href="${esc(href)}" target="_blank" rel="noopener"${main ? ' class="main"' : ""}>${esc(text)} →</a>`;
+
+  function projectHtml(p) {
+    return `
+      ${p.img ? `<img class="panel-img" data-file="${esc(p.img)}" alt="Tela do projeto ${esc(p.title)}">` : ""}
+      <div class="panel-content">
+        <p class="panel-kicker">Projeto ${p.num} · ${esc(p.kicker)}</p>
+        <h2 id="panelTitle">${esc(p.title)}</h2>
+        <span class="panel-status">${esc(p.status)}</span>
+        <div class="panel-role"><b>Meu papel</b><span>${esc(p.role)}</span></div>
+        ${p.desc.map((d) => `<p>${d}</p>`).join("")}
+        ${p.stats.length ? `<div class="panel-stats">${p.stats.map((s) => `<span>${esc(s)}</span>`).join("")}</div>` : ""}
+        <div class="panel-tags">${p.tags.map((t) => `<span>${esc(t)}</span>`).join("")}</div>
+        <div class="panel-links">${p.links.length ? p.links.map(linkHtml).join("") : '<span class="panel-note">Código privado: posso mostrar numa conversa.</span>'}</div>
+      </div>`;
+  }
+  const SOBRE_HTML = `
+    <div class="panel-content">
+      <p class="panel-kicker">Quem é o Leonardo</p>
+      <h2 id="panelTitle">Sobre mim</h2>
+      <p>Comecei em tecnologia pelo atendimento. Como analista na <strong>Loft</strong>, passo o dia perto de quem usa o sistema e vejo onde ele atrapalha. Foi assim que entrei em projetos internos técnicos e decidi migrar para desenvolvimento.</p>
+      <p>Curso <strong>Sistemas de Informação na Impacta</strong> e gosto da parte que fica por trás da tela: <strong>regras de negócio, APIs e modelagem de dados</strong>. Especifico antes de codar, registro cada decisão e só considero pronto o que tem teste e documentação.</p>
+      <p>Estou buscando <strong>estágio ou vaga júnior em back-end</strong>.</p>
+      <div class="panel-stats"><span>Python</span><span>SQL</span><span>APIs REST</span><span>Xano</span><span>OpenSpec</span></div>
+      <div class="panel-links">${linkHtml(["Baixar CV", LINKS.cv, true])}${linkHtml(["LinkedIn", LINKS.linkedin])}${linkHtml(["Versão clássica", LINKS.classic])}</div>
+    </div>`;
+  const CONTATO_HTML = `
+    <div class="panel-content">
+      <p class="panel-kicker">Portal de contato</p>
+      <h2 id="panelTitle">Vamos conversar?</h2>
+      <p>Estou buscando <strong>estágio ou vaga júnior em back-end</strong>. Se a sua equipe tem uma vaga, ou se quiser trocar uma ideia sobre algum projeto, me chama.</p>
+      <div class="panel-links">
+        ${linkHtml(["Enviar e-mail", LINKS.email, true])}${linkHtml(["LinkedIn", LINKS.linkedin])}${linkHtml(["GitHub", LINKS.github])}${linkHtml(["Baixar CV", LINKS.cv])}
+      </div>
+    </div>`;
+
+  /* Imagens: no site ficam em ../assets; na prévia publicada, ao lado do jogo. */
+  function loadPanelImages() {
+    for (const img of panelBody.querySelectorAll("img[data-file]")) {
+      const file = img.dataset.file;
+      img.onerror = () => { img.onerror = () => img.remove(); img.src = "assets/projetos/" + file; };
+      img.src = "../assets/projetos/" + file;
+    }
+  }
+
+  const visited = new Set(store.get("arenaVisited") || []);
+  function markVisited(id) {
+    if (visited.has(id)) return;
+    visited.add(id);
+    store.set("arenaVisited", [...visited]);
+    window.dispatchEvent(new CustomEvent("arena:visited", { detail: id }));
+  }
+
+  let lastFocus = null;
+  function openPanel(id) {
+    const html = PROJECTS[id] ? projectHtml(PROJECTS[id]) : id === "sobre" ? SOBRE_HTML : CONTATO_HTML;
+    panelBody.innerHTML = html;
+    loadPanelImages();
+    mode = "panel";
+    keys.clear();
+    player.attack = null;
+    buffered = null;
+    panelEl.classList.remove("hidden");
+    lastFocus = document.activeElement;
+    requestAnimationFrame(() => $("panelClose").focus());
+    markVisited(id);
+  }
+  function closePanel() {
+    panelEl.classList.add("hidden");
+    mode = "play";
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+  $("panelClose").addEventListener("click", closePanel);
+  panelEl.addEventListener("click", (e) => { if (e.target === panelEl) closePanel(); });
+
+  /* ---------- construções ---------- */
+  const glowMats = [];
+  function glowMat(color, intensity = 0.6) {
+    const m = new THREE.MeshLambertMaterial({ color: col(color), emissive: col(color), emissiveIntensity: intensity });
+    glowMats.push(m);
+    return m;
+  }
+
+  /* Gira um ponto local (lx, lz) pelo ângulo do grupo e devolve a posição no mundo. */
+  function worldOf(group, lx, lz) {
+    const c = Math.cos(group.rotation.y), s = Math.sin(group.rotation.y);
+    return { x: group.position.x + lx * c + lz * s, z: group.position.z - lx * s + lz * c };
+  }
+
+  const totems = [];
+  const interactables = [];
+  const fadeables = []; // portões que ficam transparentes quando tampam a visão
+
+  for (const id of Object.keys(PROJECTS)) {
+    const zn = zoneById(id);
+    const p = PROJECTS[id];
+    const base = heightAt(zn.x, zn.z);
+    const toCenter = Math.atan2(-zn.x, -zn.z); // olha para o centro da ilha
+
+    // portão do dojo, na borda voltada para o centro
+    const gate = new THREE.Group();
+    gate.position.set(zn.x, base, zn.z);
+    gate.rotation.y = toCenter;
+    scene.add(gate);
+    for (const side of [-1, 1]) {
+      box(gate, 0.4, 3.0, 0.4, "#7a1f1f", side * 1.7, 1.5, 2.6);
+      box(gate, 0.55, 0.3, 0.55, "#3f3f46", side * 1.7, 0.15, 2.6);
+      const w = worldOf(gate, side * 1.7, 2.6);
+      colliders.push({ x: w.x, z: w.z, r: 0.35 });
+    }
+    box(gate, 4.6, 0.32, 0.5, zn.accent, 0, 3.05, 2.6);
+    box(gate, 4.0, 0.2, 0.36, "#111827", 0, 2.6, 2.6);
+    const gateMats = [];
+    gate.traverse((o) => {
+      if (!o.isMesh) return;
+      o.material = o.material.clone();
+      o.material.transparent = true;
+      gateMats.push(o.material);
+    });
+    const gc = worldOf(gate, 0, 2.6);
+    fadeables.push({ x: gc.x, z: gc.z, radius: 2.6, mats: gateMats, opacity: 1 });
+    // lanternas nos cantos de trás
+    for (const side of [-1, 1]) {
+      box(gate, 0.3, 0.9, 0.3, "#57534e", side * 2.3, 0.45, -2.3);
+      const lamp = new THREE.Mesh(boxGeo, glowMat("#fde68a", 0.8));
+      lamp.scale.set(0.42, 0.42, 0.42);
+      lamp.position.set(side * 2.3, 1.1, -2.3);
+      gate.add(lamp);
+    }
+
+    // totem do projeto, no fundo do dojo
+    const totem = new THREE.Group();
+    const tPos = worldOf(gate, 0, -0.8);
+    totem.position.set(tPos.x, base, tPos.z);
+    totem.rotation.y = toCenter;
+    scene.add(totem);
+    box(totem, 1.3, 0.3, 1.3, "#57534e", 0, 0.15, 0);
+    const column = new THREE.Group();
+    column.position.y = 0.3;
+    totem.add(column);
+    box(column, 0.9, 0.7, 0.9, zn.accent, 0, 0.35, 0);
+    box(column, 0.8, 0.7, 0.8, "#e7e5e4", 0, 1.05, 0);
+    box(column, 0.9, 0.7, 0.9, zn.accent, 0, 1.75, 0);
+    box(column, 0.5, 0.18, 0.02, "#111827", 0, 1.05, 0.41); // "placa"
+    const gem = new THREE.Mesh(boxGeo, glowMat(zn.accent, 0.7));
+    gem.scale.set(0.55, 0.55, 0.55);
+    gem.position.y = 3.05;
+    totem.add(gem);
+    colliders.push({ x: tPos.x, z: tPos.z, r: 0.6 });
+
+    const t = { id, x: tPos.x, z: tPos.z, group: totem, column, gem, hp: 3, flash: 0, accent: zn.accent };
+    totems.push(t);
+    targets.push({
+      kind: "totem", x: t.x, z: t.z, r: 0.6,
+      onHit(dirX, dirZ, attack) {
+        const dmg = attack.type === "kick" ? 2 : 1;
+        t.hp = Math.max(0, t.hp - dmg);
+        t.flash = 1;
+        const at = new V3(t.x, base + 2.6, t.z);
+        burst(at, [t.accent, "#e7e5e4", "#57534e"], 10, 4);
+        if (t.hp > 0) {
+          floatText(`${3 - t.hp}/3`, at, "big");
+        } else {
+          floatText("ABERTO!", at, "combo");
+          burst(at, [t.accent, "#fde68a", "#ffffff"], 26, 7);
+          setTimeout(() => { if (mode === "play") openPanel(id); t.hp = 3; }, 380);
+        }
+      },
+    });
+    interactables.push({ id, x: t.x, z: t.z, range: 2.8, verb: `abrir ${p.short}` });
+    addLabel(`${p.num} · ${p.title.toUpperCase()}`, () => new V3(t.x, base + 4.1, t.z));
+  }
+
+  // pedra "Sobre mim"
+  const sobreZ = zoneById("sobre");
+  const sobre = (() => {
+    const base = heightAt(sobreZ.x, sobreZ.z);
+    const g = new THREE.Group();
+    g.position.set(sobreZ.x, base, sobreZ.z);
+    g.rotation.y = Math.atan2(-sobreZ.x, -sobreZ.z);
+    scene.add(g);
+    box(g, 1.8, 0.3, 1.0, "#57534e", 0, 0.15, 0);
+    box(g, 1.4, 2.4, 0.45, "#a8a29e", 0, 1.5, 0);
+    box(g, 1.2, 0.12, 0.47, sobreZ.accent, 0, 2.3, 0);
+    box(g, 1.0, 0.08, 0.47, "#78716c", 0, 1.8, 0);
+    box(g, 1.0, 0.08, 0.47, "#78716c", 0, 1.5, 0);
+    box(g, 0.8, 0.08, 0.47, "#78716c", 0, 1.2, 0);
+    const gem = new THREE.Mesh(boxGeo, glowMat(sobreZ.accent, 0.7));
+    gem.scale.set(0.4, 0.4, 0.4);
+    gem.position.y = 3.2;
+    g.add(gem);
+    colliders.push({ x: sobreZ.x, z: sobreZ.z, r: 0.85 });
+    return { x: sobreZ.x, z: sobreZ.z, group: g, gem, base };
+  })();
+  targets.push({
+    kind: "sobre", x: sobre.x, z: sobre.z, r: 0.85,
+    onHit() {
+      burst(new V3(sobre.x, sobre.base + 2.4, sobre.z), ["#a8a29e", sobreZ.accent], 10, 3.5);
+      setTimeout(() => { if (mode === "play") openPanel("sobre"); }, 250);
+    },
+  });
+  interactables.push({ id: "sobre", x: sobre.x, z: sobre.z, range: 2.8, verb: "ler Sobre mim" });
+  addLabel("SOBRE MIM", () => new V3(sobre.x, sobre.base + 3.9, sobre.z));
+
+  // portal de contato: atravessar abre o painel
+  const contatoZ = zoneById("contato");
+  const portal = (() => {
+    const base = heightAt(contatoZ.x, contatoZ.z);
+    const g = new THREE.Group();
+    g.position.set(contatoZ.x, base, contatoZ.z);
+    g.rotation.y = Math.atan2(-contatoZ.x, -contatoZ.z);
+    scene.add(g);
+    for (const side of [-1, 1]) {
+      box(g, 0.5, 3.4, 0.6, "#334155", side * 1.4, 1.7, 0);
+      const w = worldOf(g, side * 1.4, 0);
+      colliders.push({ x: w.x, z: w.z, r: 0.4 });
+    }
+    box(g, 3.3, 0.5, 0.6, "#334155", 0, 3.6, 0);
+    box(g, 3.5, 0.14, 0.7, contatoZ.accent, 0, 3.92, 0);
+    const field = new THREE.Mesh(
+      new THREE.PlaneGeometry(2.3, 3.1),
+      new THREE.MeshBasicMaterial({ color: col("#2dd4bf"), transparent: true, opacity: 0.45, side: THREE.DoubleSide, depthWrite: false })
+    );
+    field.position.y = 1.85;
+    g.add(field);
+    return { x: contatoZ.x, z: contatoZ.z, group: g, field, base, inside: false };
+  })();
+  interactables.push({ id: "contato", x: portal.x, z: portal.z, range: 2.8, verb: "abrir o contato" });
+  addLabel("CONTATO · atravesse o portal", () => new V3(portal.x, portal.base + 4.6, portal.z));
+
+  // placa de boas-vindas na praça
+  addLabel("BEM-VINDO À ARENA · explore os dojos", () => new V3(0, heightAt(0, 0) + 3.6, -2.4)).maxDist = 14;
+
+  function nearestInteractable() {
+    let best = null, bestD = Infinity;
+    for (const it of interactables) {
+      const d = Math.hypot(it.x - player.pos.x, it.z - player.pos.z);
+      if (d < it.range && d < bestD) { best = it; bestD = d; }
+    }
+    return best;
+  }
+  function interact() {
+    const it = nearestInteractable();
+    if (it) openPanel(it.id);
+  }
+
+  function updateWorldProps(dt) {
+    const t = performance.now() / 1000;
+    for (const tt of totems) {
+      tt.gem.rotation.y += dt * 1.4;
+      tt.gem.position.y = 3.05 + Math.sin(t * 2 + tt.x) * 0.12;
+      tt.flash = Math.max(0, tt.flash - dt * 4);
+      tt.column.position.x = Math.sin(t * 60) * 0.05 * tt.flash;
+      tt.column.scale.setScalar(1 + tt.flash * 0.06);
+    }
+    sobre.gem.rotation.y += dt * 1.2;
+    sobre.gem.position.y = 3.2 + Math.sin(t * 2) * 0.1;
+    portal.field.material.opacity = 0.35 + Math.sin(t * 3) * 0.12;
+    for (const m of glowMats) m.emissiveIntensity = 0.55 + Math.sin(t * 2.4) * 0.15;
+
+    // atravessar o portal abre o contato (uma vez por passagem)
+    if (mode === "play") {
+      const d = Math.hypot(player.pos.x - portal.x, player.pos.z - portal.z);
+      if (d < 0.75 && !portal.inside) {
+        portal.inside = true;
+        burst(new V3(portal.x, portal.base + 1.6, portal.z), ["#2dd4bf", "#a7f3d0", "#ffffff"], 18, 4);
+        openPanel("contato");
+      } else if (d > 1.6) {
+        portal.inside = false;
+      }
+    }
+  }
+
+  /* =========================================================
      DICAS DE CONTEXTO
      ========================================================= */
   const promptEl = $("prompt");
+  const touchLike = window.matchMedia("(pointer: coarse)").matches;
   function updatePrompt() {
     if (mode !== "play") { promptEl.classList.add("hidden"); return; }
-    const d = Math.hypot(player.pos.x - dummy.x, player.pos.z - dummy.z);
-    if (d < 3.2) {
-      promptEl.textContent = "J soco · K chute";
-      promptEl.classList.remove("hidden");
-    } else {
-      promptEl.classList.add("hidden");
-    }
+    const it = nearestInteractable();
+    const nearDummy = Math.hypot(player.pos.x - dummy.x, player.pos.z - dummy.z) < 3.2;
+    let text = "";
+    if (it && PROJECTS[it.id]) text = touchLike ? `Golpeie 3x ou toque E para ${it.verb}` : `Golpeie 3x ou aperte E para ${it.verb}`;
+    else if (it) text = touchLike ? `Toque E para ${it.verb}` : `Aperte E para ${it.verb}`;
+    else if (nearDummy) text = "Clique ou J: soco · Botão direito ou K: chute";
+    promptEl.textContent = text;
+    promptEl.classList.toggle("hidden", !text);
   }
 
   /* =========================================================
@@ -1134,12 +1504,9 @@
     renderer.setSize(window.innerWidth, window.innerHeight);
   });
 
-  // HUD do estágio atual: missões e "abrir" chegam nos blocos 4 e 5
+  // HUD do estágio atual: missões e barra de progresso chegam no bloco 5
   $("quests").classList.add("hidden");
   document.querySelector(".hud-bar").classList.add("hidden");
-  for (const el of document.querySelectorAll(".hud-help span")) {
-    if (/abrir/.test(el.textContent)) el.classList.add("hidden");
-  }
 
   let last = performance.now();
   openCreator();
@@ -1157,6 +1524,7 @@
     updateTreeFade(dt);
     updateParticles(dt);
     updateFloaters(dt);
+    updateWorldProps(dt);
     updateLabels();
     updatePrompt();
     renderer.render(scene, camera);
@@ -1172,6 +1540,7 @@
   // ganchos para testes automatizados e para os próximos blocos
   window.__arena = {
     player, heightAt, groundUnder, colliders, ZONES, targets, dummy, setLook, hits,
+    totems, portal, sobre, visited, PROJECTS, openPanel, closePanel,
     get mode() { return mode; }, get combo() { return combo; }, startGame, openCreator,
   };
 })();
