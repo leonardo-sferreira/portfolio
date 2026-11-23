@@ -51,7 +51,7 @@ function attachGlitch(el) {
     step();
   });
 }
-document.querySelectorAll(".navbar nav a, .logo").forEach(attachGlitch);
+document.querySelectorAll(".navbar nav a:not(.nav-github), .logo").forEach(attachGlitch);
 
 /* ---------- ÍCONES: DESENHO (SVG DRAW-IN) ---------- */
 function prepareDraw(svg) {
@@ -88,12 +88,25 @@ const preloader = document.getElementById("preloader");
 const preloaderCanvas = document.getElementById("preloaderCanvas");
 const loaderPct = document.getElementById("loaderPct");
 
+let preloaderGone = false;
 function dismissPreloader() {
+  if (preloaderGone) return;
+  preloaderGone = true;
   preloader.classList.add("hide");
   setTimeout(() => preloader.remove(), 700);
 }
 
-if (preloaderCanvas && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+/* Quem já viu a abertura nesta sessão entra direto no conteúdo. */
+let seenIntro = false;
+try {
+  seenIntro = sessionStorage.getItem("introVista") === "1";
+  sessionStorage.setItem("introVista", "1");
+} catch (e) {}
+
+if (seenIntro) {
+  preloader.remove();
+  preloaderGone = true;
+} else if (preloaderCanvas && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
   const pctx = preloaderCanvas.getContext("2d");
   let pw = 0, ph = 0, pdpr = Math.min(window.devicePixelRatio || 1, 2);
 
@@ -120,7 +133,7 @@ if (preloaderCanvas && !window.matchMedia("(prefers-reduced-motion: reduce)").ma
 
   const PLINK = 150;
   const startTime = performance.now();
-  const DURATION_MS = 1700;
+  const DURATION_MS = 900;
   let dismissed = false;
 
   function drawPreloader() {
@@ -166,10 +179,10 @@ if (preloaderCanvas && !window.matchMedia("(prefers-reduced-motion: reduce)").ma
     }, remaining);
   });
 } else {
-  window.addEventListener("load", () => setTimeout(dismissPreloader, 300));
+  window.addEventListener("load", () => setTimeout(dismissPreloader, 200));
 }
 
-setTimeout(dismissPreloader, 4500);
+setTimeout(dismissPreloader, 3000);
 
 /* ---------- SCROLL REVEAL ---------- */
 const revealEls = document.querySelectorAll(".reveal");
@@ -291,7 +304,7 @@ if (window.matchMedia("(pointer: fine)").matches) {
 const roleTextEl = document.getElementById("roleText");
 
 if (roleTextEl) {
-  const roles = ["Web", "Mobile", "Automações", "Banco de Dados"];
+  const roles = ["Back-end e APIs", "Banco de Dados", "Automações", "Web"];
   let roleIndex = 0;
 
   setInterval(() => {
@@ -447,6 +460,19 @@ const PROJECTS = {
       "O sistema cuida da triagem (sintomas e sinais vitais viram uma classificação de risco), direciona cada ficha para a especialidade certa e mostra as chamadas num painel público que nunca expõe nome ou CPF.",
       "Projeto finalizado: todas as funcionalidades planejadas foram entregues, testadas no sistema integrado e validadas por mim como PO. O sistema ganhou o nome de Prioriza e tem manual do usuário e documentação técnica publicados.",
     ],
+    decisionsTitle: "Decisões que tomei como PO",
+    decisions: [
+      "Chamada sempre manual: uma pessoa é responsável por cada chamada, sem repetição nem encerramento automáticos.",
+      "Painel público montado campo a campo, com um teste que barra qualquer dado pessoal. Nome e CPF nunca saem do servidor.",
+      "Limites de risco guardados no banco, para ajustar a regra clínica sem precisar de um novo deploy.",
+      "Próximo paciente escolhido no servidor, numa operação atômica: dois médicos nunca pegam a mesma ficha.",
+      "Especificação antes do código no OpenSpec, com IA ajudando na implementação e testes no CI antes de cada merge.",
+    ],
+    lessons: [
+      "Regra clínica precisa estar escrita antes do código. A especificação virou o critério de aceite que eu usava para validar cada entrega.",
+      "Toda escolha técnica tem custo: sem tempo real no plano do Xano, os painéis atualizam a cada 5 segundos, e isso ficou registrado como decisão.",
+      "Dar um identificador fixo para cada teste deixou a validação rastreável: cada requisito aponta para os testes que o comprovam.",
+    ],
     tech: "Por trás da tela: front-end em Reflex com 33 telas, back-end em Xano com 23 tabelas e 71 endpoints, 127 requisitos especificados no OpenSpec e 486 testes catalogados.",
     images: [
       { src: "assets/projetos/ps-fila-totem.png", alt: "Totem de autoatendimento do pronto-socorro" },
@@ -463,7 +489,18 @@ const PROJECTS = {
     desc: [
       "O ConectaRH nasceu pra tirar RH, gestores e colaboradores das planilhas e do e-mail — um lugar só para ponto, férias, documentos e desligamento, onde cada perfil vê só o que pode ver.",
       "Toda decisão importante (aprovar férias, corrigir ponto, mudar um dado cadastral) fica registrada: quem fez, quando e por quê.",
-      "Projeto finalizado e publicado: as 40 entregas planejadas foram concluídas, testadas e arquivadas. O app está no ar, com contas de demonstração para os quatro perfis, manual do usuário e documentação técnica.",
+      "Projeto finalizado e publicado: as 40 entregas planejadas foram concluídas, testadas e arquivadas, com manual do usuário e documentação técnica.",
+    ],
+    decisionsTitle: "Decisões do projeto",
+    decisions: [
+      "O backend decide tudo: o menu por perfil é só conveniência, e a autorização é conferida em cada endpoint e no CI.",
+      "Arquivos vão direto para um bucket privado do Supabase por um endereço de uso único. A chave nunca sai do backend.",
+      "Onde a lei pede, só inclusão: ponto e banco de horas nunca são editados, e uma correção vira um novo registro.",
+      "O atestado, que é dado de saúde, nunca chega ao gestor, e a auditoria guarda os dados pessoais mascarados.",
+    ],
+    lessons: [
+      "LGPD muda o modelo de dados, não só o texto do aviso: quem vê cada campo é decidido no banco e na API.",
+      "Uma checagem automática no CI pega o endpoint sem guarda de acesso que uma revisão manual deixaria passar.",
     ],
     tech: "Por trás da tela: 55 telas em Streamlit, backend no Xano com 80 tabelas e 316 endpoints, arquivos no Supabase e 52 verificações automatizadas no CI a cada Pull Request.",
     images: [
@@ -482,6 +519,11 @@ const PROJECTS = {
       "O Sabor Local é um protótipo de app de delivery de comida mineira, pensado pra ter a mesma fluidez de apps grandes como o iFood — do cardápio ao acompanhamento do pedido no mapa.",
       "Desenhei o fluxo inteiro: login, cardápio por categoria com sugestão do chef, carrinho, pagamento, endereço e avaliação da entrega.",
     ],
+    decisionsTitle: "Decisões que tomei",
+    decisions: [
+      "Desenhar os dois lados da operação: o app do cliente e o painel do restaurante que recebe e despacha o pedido.",
+      "Organizar o arquivo do Figma por fluxo numerado, com uma seção de estilo e componentes reaproveitados.",
+    ],
     tech: "Por trás da tela: protótipo navegável completo no Figma, organizado por fluxo (acesso, cardápio, pagamento, endereço, pedido e perfil), pronto para virar implementação real.",
     images: [
       { src: "assets/projetos/sabor-local-home.png", alt: "Tela inicial do app com cardápio" },
@@ -498,6 +540,11 @@ const PROJECTS = {
     desc: [
       "Criei esse bot pra resolver um problema bem pessoal: parar de esquecer de anotar gasto. Ele entende uma mensagem curta, tipo '45,90 almoço', e já guarda tudo organizado.",
       "Também avisa sozinho quando uma fatura ou parcela tá perto de vencer, pergunta no fim do dia se eu lancei meus gastos, manda um resumo da semana e fecha o mês sozinho.",
+    ],
+    decisionsTitle: "Decisões que tomei",
+    decisions: [
+      "Entrada por uma mensagem curta, como \"45,90 almoço\", em vez de formulário: o problema era esquecer de anotar.",
+      "Rotinas agendadas para o que eu esquecia: lembrete no fim do dia, aviso de vencimento e fechamento do mês.",
     ],
     tech: "Por trás da tela: bot em Python integrado à API do Telegram e à API do Notion. Repositório privado, sem prints públicos por enquanto.",
     images: [],
@@ -516,6 +563,19 @@ const modalRole = document.getElementById("modalRole");
 const modalDesc = document.getElementById("modalDesc");
 const modalTags = document.getElementById("modalTags");
 const modalLink = document.getElementById("modalLink");
+const modalDecisions = document.getElementById("modalDecisions");
+const modalLessons = document.getElementById("modalLessons");
+
+function renderList(box, title, items) {
+  if (!box) return;
+  if (!items || !items.length) {
+    box.style.display = "none";
+    return;
+  }
+  box.style.display = "";
+  box.querySelector("strong").textContent = title;
+  box.querySelector("ul").innerHTML = items.map((i) => `<li>${i}</li>`).join("");
+}
 
 if (modalOverlay) {
   let galImages = [];
@@ -600,6 +660,8 @@ if (modalOverlay) {
     modalRole.textContent = p.role;
     modalDesc.innerHTML = p.desc.map((para) => `<p>${para}</p>`).join("") +
       (p.tech ? `<p class="tech-note">${p.tech}</p>` : "");
+    renderList(modalDecisions, p.decisionsTitle || "Decisões que tomei", p.decisions);
+    renderList(modalLessons, "O que aprendi", p.lessons);
     modalTags.innerHTML = p.tags.map((t) => `<li>${t}</li>`).join("");
     if (p.link) {
       modalLink.style.display = "inline-flex";

@@ -133,6 +133,10 @@ h1, h2, h3 { font-family: var(--font-head); }
 }
 .navbar nav a:hover { color: var(--text); }
 .navbar nav a:hover::after { width: 100%; }
+.navbar nav { align-items: center; }
+.navbar nav a.nav-github { display: inline-flex; }
+.navbar nav a.nav-github::after { display: none; }
+.navbar nav a.nav-github svg { width: 18px; height: 18px; }
 
 /* ---------- SECTIONS ---------- */
 section {
@@ -301,6 +305,15 @@ h2 {
   transform: translateY(-2px);
 }
 
+.hero-value strong { color: var(--text); font-weight: 600; }
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+}
+
 .contato-actions {
   display: flex;
   flex-wrap: wrap;
@@ -340,6 +353,38 @@ h2 {
   text-align: center;
 }
 .sobre p { color: var(--text-muted); }
+.sobre-texto { text-align: left; }
+.sobre-texto p { margin-bottom: 16px; line-height: 1.7; }
+.sobre-texto strong { color: var(--text); font-weight: 600; }
+
+.sobre-fatos {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 28px;
+  text-align: left;
+}
+.sobre-fatos li {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 14px 16px;
+  color: var(--text);
+  font-size: 0.92rem;
+}
+.sobre-fatos li span {
+  display: block;
+  font-size: 0.72rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--accent-light);
+  margin-bottom: 4px;
+}
+.sobre-fatos li em { color: var(--text-muted); font-style: normal; }
+@media (max-width: 640px) {
+  .sobre-fatos { grid-template-columns: 1fr; }
+}
 
 /* ---------- SERVIÇOS (scroll pinado) ---------- */
 .servicos { background: var(--bg-alt); }
@@ -1015,6 +1060,33 @@ h2 {
   color: var(--text-muted);
   font-size: 0.95rem;
   margin-bottom: 14px;
+}
+
+.modal-extra { margin: 6px 0 20px; }
+.modal-extra strong {
+  display: block;
+  font-size: 0.78rem;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--accent-light);
+  margin-bottom: 10px;
+}
+.modal-extra ul { list-style: none; display: grid; gap: 8px; }
+.modal-extra li {
+  position: relative;
+  padding-left: 18px;
+  color: var(--text-muted);
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+.modal-extra li::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 0.6em;
+  width: 7px; height: 7px;
+  border-radius: 2px;
+  background: var(--accent);
+  transform: rotate(45deg);
 }
 
 .modal-desc p.tech-note {
