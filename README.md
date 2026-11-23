@@ -9,7 +9,7 @@ Site de portfólio pessoal, feito em HTML, CSS e JavaScript puro, sem framework 
 | Projeto | Status | Stack | Links |
 | --- | --- | --- | --- |
 | **Fila Prioritária — Pronto-Socorro** (Prioriza) | Finalizado · acadêmico (Impacta) | Reflex, Xano, OpenSpec | [Repositório](https://github.com/leonardo-sferreira/ps-fila-prioritaria) · [Documentação](https://leonardo-sferreira.github.io/ps-fila-prioritaria/) |
-| **ConectaRH** | Finalizado e publicado · acadêmico | Streamlit, Xano, Supabase | [Repositório](https://github.com/leonardo-sferreira/conectahr) · [App](https://conectahr-wtdxtqbzz4lyrpjv8a48nt.streamlit.app/) · [Documentação](https://leonardo-sferreira.github.io/conectahr/) |
+| **ConectaRH** | Finalizado e publicado · acadêmico | Streamlit, Xano, Supabase | [Repositório](https://github.com/leonardo-sferreira/conectahr) · [Documentação](https://leonardo-sferreira.github.io/conectahr/) |
 | **Sabor Local** | Protótipo · acadêmico | Figma, FlutterFlow, UX/UI | [Protótipo no Figma](https://www.figma.com/design/iRn8igu0iCwyqYTathrz9P/Sabor-local?node-id=0-1) · [Telas](https://github.com/leonardo-sferreira/SaborLocal-Figma) |
 | **Bot de Finanças** | Em uso pessoal | Python, Telegram Bot API, Notion API | Repositório privado |
 
