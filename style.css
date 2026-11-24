@@ -653,91 +653,102 @@ h2 {
   opacity: 1;
 }
 
-/* ---------- TRAJETÓRIA (projetos) ---------- */
+/* ---------- PROJETOS ---------- */
+.trajetoria { max-width: 1100px; margin: 0 auto; box-sizing: content-box; }
+.trajetoria h2, .trajetoria .section-tag { text-align: center; }
+.proj-destaques { display: flex; flex-direction: column; gap: 28px; }
+.proj-feature {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  gap: 36px;
+  align-items: center;
+  padding: 28px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 18px;
+}
+.proj-feature:nth-child(even) .traj-media { order: 2; }
+.proj-outros {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 28px;
+  margin-top: 28px;
+}
+.proj-mini {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  padding: 24px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 18px;
+}
+.proj-mini .device-viewport { aspect-ratio: 16 / 8; }
+.proj-feature .device-viewport img,
+.proj-mini .device-viewport img { animation: none; transition: transform 0.6s ease; }
+.proj-feature .traj-media:hover .device-viewport img { transform: scale(1.03); }
+
+.traj-media--telas .device-viewport {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 18px 18px 0;
+  background: radial-gradient(circle at 50% 0%, rgba(34,211,238,0.16), transparent 70%), var(--bg-alt);
+}
+.traj-media--telas .device-viewport img {
+  width: 28%;
+  height: auto;
+  border-radius: 12px 12px 0 0;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+.traj-media--telas .device-viewport img:nth-child(2) { margin-top: 18px; }
+.traj-media--telas:hover .device-viewport img { transform: translateY(-6px); }
+
+.proj-role {
+  font-size: 0.9rem;
+  color: var(--text);
+  margin-bottom: 16px;
+  line-height: 1.55;
+}
+.proj-role span {
+  display: block;
+  font-size: 0.7rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--card-accent);
+  margin-bottom: 2px;
+}
+.proj-resumo { color: var(--text-muted); font-size: 0.92rem; margin-bottom: 16px; line-height: 1.6; }
+.proj-numeros {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 22px;
+  margin-bottom: 16px;
+  padding: 12px 0;
+  border-top: 1px solid rgba(255,255,255,0.07);
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  color: var(--text-muted);
+  font-size: 0.82rem;
+}
+.proj-numeros strong {
+  font-family: var(--font-head);
+  font-size: 1.25rem;
+  color: var(--text);
+  margin-right: 4px;
+}
+@media (max-width: 900px) {
+  .proj-feature { grid-template-columns: 1fr; gap: 22px; padding: 20px; }
+  .proj-feature:nth-child(even) .traj-media { order: 0; }
+  .proj-outros { grid-template-columns: 1fr; }
+  .proj-mini { padding: 20px; }
+}
 .trajetoria-intro {
   max-width: 560px;
   margin: 0 auto 48px;
   text-align: center;
   color: var(--text-muted);
-}
-
-.trajetoria-layout {
-  display: grid;
-  grid-template-columns: 240px 1fr;
-  gap: 48px;
-  max-width: 1040px;
-  margin: 0 auto;
-  align-items: start;
-}
-
-.trajetoria-nav {
-  position: sticky;
-  top: 110px;
-}
-
-.traj-path {
-  position: relative;
-  width: 230px;
-  height: 234px;
-}
-
-.path-line {
-  position: absolute;
-  height: 2px;
-  background: rgba(255,255,255,0.12);
-  transform-origin: left center;
-}
-
-.path-item {
-  position: absolute;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  text-decoration: none;
-}
-
-.path-diamond {
-  width: 28px;
-  height: 28px;
-  flex-shrink: 0;
-  background: var(--bg-alt);
-  border: 2px solid rgba(255,255,255,0.15);
-  transform: rotate(45deg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: border-color 0.3s, box-shadow 0.3s;
-}
-
-.path-diamond span {
-  display: inline-block;
-  transform: rotate(-45deg);
-  font-family: var(--font-head);
-  font-size: 0.6rem;
-  color: var(--text-muted);
-  transition: color 0.3s;
-}
-
-.path-label {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  white-space: nowrap;
-  transition: color 0.3s, font-weight 0.3s;
-}
-
-.path-item:hover .path-label { color: var(--text); }
-
-.path-item.active .path-diamond {
-  border-color: var(--n-accent);
-  box-shadow: 0 0 14px -2px var(--n-accent);
-}
-.path-item.active .path-diamond span { color: var(--text); }
-.path-item.active .path-label { color: var(--text); font-weight: 600; }
-
-.trajetoria-content {
-  display: flex;
-  flex-direction: column;
-  gap: 72px;
 }
 
 .traj-case {
@@ -762,14 +773,6 @@ h2 {
 .traj-case h3 {
   font-size: 1.4rem;
   margin-bottom: 20px;
-}
-
-.traj-body {
-  display: grid;
-  grid-template-columns: 260px 1fr;
-  gap: 28px;
-  align-items: start;
-  perspective: 800px;
 }
 
 .traj-media {
@@ -1179,6 +1182,50 @@ h2 {
   margin-top: 4px;
 }
 
+.modal-sector {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  margin-bottom: 22px;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+.modal-sector span,
+.modal-tools span {
+  font-size: 0.72rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.modal-sector b { font-weight: 500; }
+.modal-need p { color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; }
+.modal-extra li strong {
+  display: inline;
+  font-size: inherit;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--text);
+  margin: 0;
+}
+.modal-extra ol { list-style: none; display: grid; gap: 8px; counter-reset: etapa; }
+.modal-extra ol li { counter-increment: etapa; padding-left: 30px; }
+.modal-extra ol li::before {
+  content: counter(etapa);
+  width: 20px; height: 20px;
+  top: 0.1em;
+  border-radius: 50%;
+  transform: none;
+  background: rgba(45,212,191,0.15);
+  color: var(--accent-light);
+  font-size: 0.7rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-tools { margin-top: 12px; font-size: 0.88rem; color: var(--text); display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; }
+.modal-results li::before { background: #4ade80; }
 .modal-body .projeto-tags { margin-bottom: 20px; }
 .modal-body .projeto-link { font-size: 0.9rem; }
 
@@ -1188,9 +1235,6 @@ h2 {
 }
 
 @media (max-width: 760px) {
-  .trajetoria-layout { grid-template-columns: 1fr; gap: 32px; }
-  .trajetoria-nav { position: static; }
-  .traj-body { grid-template-columns: 1fr; }
 }
 
 /* ---------- CONTATO ---------- */

@@ -199,160 +199,128 @@
 
   <!-- PROJETOS / TRAJETÓRIA -->
   <section class="trajetoria" id="projetos">
-    <span class="section-tag reveal">Trabalhos</span>
-    <h2 class="split-text">Minha trajetória</h2>
-    <p class="trajetoria-intro reveal">Quatro projetos, do acadêmico ao pessoal, cobrindo web, mobile, automação e banco de dados.</p>
+    <span class="section-tag reveal">Projetos</span>
+    <h2 class="split-text">O que eu já construí</h2>
+    <p class="trajetoria-intro reveal">Dois sistemas completos publicados, um protótipo de app e uma automação que uso no dia a dia.</p>
 
-    <div class="trajetoria-layout">
+    <div class="proj-destaques">
 
-      <aside class="trajetoria-nav">
-        <div class="traj-path">
-          <div class="path-line" style="left:14px; top:14px; width:70.7px; transform:rotate(64.9deg);"></div>
-          <div class="path-line" style="left:44px; top:78px; width:70.7px; transform:rotate(115.1deg);"></div>
-          <div class="path-line" style="left:14px; top:142px; width:70.7px; transform:rotate(64.9deg);"></div>
-
-          <a href="#proj-01" class="path-item active" data-target="proj-01" style="top:0; left:0; --n-accent:#2dd4bf">
-            <span class="path-diamond"><span>01</span></span>
-            <span class="path-label">Fila Prioritária</span>
-          </a>
-          <a href="#proj-02" class="path-item" data-target="proj-02" style="top:64px; left:30px; --n-accent:#4f8ff0">
-            <span class="path-diamond"><span>02</span></span>
-            <span class="path-label">ConectaRH</span>
-          </a>
-          <a href="#proj-03" class="path-item" data-target="proj-03" style="top:128px; left:0; --n-accent:#22d3ee">
-            <span class="path-diamond"><span>03</span></span>
-            <span class="path-label">Sabor Local</span>
-          </a>
-          <a href="#proj-04" class="path-item" data-target="proj-04" style="top:192px; left:30px; --n-accent:#f2c14e">
-            <span class="path-diamond"><span>04</span></span>
-            <span class="path-label">Bot de Finanças</span>
-          </a>
+      <article class="traj-case proj-feature reveal" id="proj-01" data-accent="teal">
+        <div class="traj-media" data-project="proj-01" role="button" tabindex="0" aria-label="Ver case completo de Fila Prioritária">
+          <div class="device-bar"><span></span><span></span><span></span></div>
+          <div class="device-viewport" style="aspect-ratio:1280/800"><img src="assets/projetos/ps-fila-painel.png" alt="Painel de chamadas do sistema de fila prioritária para pronto-socorro"></div>
+          <span class="media-zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M9 11h4M11 9v4"/></svg></span>
         </div>
-      </aside>
-
-      <div class="trajetoria-content">
-
-        <article class="traj-case reveal" id="proj-01" data-accent="teal">
+        <div class="traj-text">
           <span class="traj-eyebrow">Finalizado · Projeto acadêmico (Impacta)</span>
           <h3>Fila Prioritária — Pronto-Socorro</h3>
-          <div class="traj-body">
-            <div class="traj-media" data-project="proj-01" role="button" tabindex="0" aria-label="Ver case completo de Fila Prioritária">
-              <div class="device-bar"><span></span><span></span><span></span></div>
-              <div class="device-viewport"><img src="assets/projetos/ps-fila-painel.png" alt="Painel de chamadas do sistema de fila prioritária para pronto-socorro"></div>
-              <span class="media-zoom-hint">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M9 11h4M11 9v4"/></svg>
-              </span>
-            </div>
-            <div class="traj-text">
-              <ul class="traj-bullets">
-                <li>Classifica cada paciente em Vermelha, Amarela ou Azul somando sintomas e sinais vitais — não é só ordem de chegada.</li>
-                <li>Direciona a ficha pra especialidade certa e distribui pro médico elegível, sem escolha manual.</li>
-                <li>Painel público mostra senha e sala, nunca nome ou CPF.</li>
-              </ul>
-              <ul class="projeto-tags"><li>Reflex</li><li>Xano</li><li>OpenSpec</li></ul>
-              <div class="traj-actions">
-                <a href="https://github.com/leonardo-sferreira/ps-fila-prioritaria" target="_blank" rel="noopener" class="projeto-link">Ver repositório →</a>
-                <a href="https://leonardo-sferreira.github.io/ps-fila-prioritaria/" target="_blank" rel="noopener" class="projeto-link">Ver documentação →</a>
-                <button type="button" class="btn-case" data-project="proj-01">Ver case completo</button>
-              </div>
-            </div>
+          <p class="proj-role"><span>Meu papel</span>Product Owner: planejei as sprints e participei de toda a produção, no front-end e no back-end.</p>
+          <ul class="traj-bullets">
+            <li>Classifica cada paciente em Vermelha, Amarela ou Azul somando sintomas e sinais vitais — não é só ordem de chegada.</li>
+            <li>Direciona a ficha pra especialidade certa e distribui pro médico elegível, sem escolha manual.</li>
+            <li>Painel público mostra senha e sala, nunca nome ou CPF.</li>
+          </ul>
+          <ul class="proj-numeros">
+            <li><strong>33</strong> telas</li>
+            <li><strong>71</strong> endpoints</li>
+            <li><strong>486</strong> testes</li>
+          </ul>
+          <ul class="projeto-tags"><li>Reflex</li><li>Xano</li><li>OpenSpec</li></ul>
+          <div class="traj-actions">
+            <button type="button" class="btn-case" data-project="proj-01">Ver case completo</button>
+            <a href="https://github.com/leonardo-sferreira/ps-fila-prioritaria" target="_blank" rel="noopener" class="projeto-link">Repositório →</a>
+            <a href="https://leonardo-sferreira.github.io/ps-fila-prioritaria/" target="_blank" rel="noopener" class="projeto-link">Documentação →</a>
           </div>
-        </article>
+        </div>
+      </article>
 
-        <article class="traj-case reveal" id="proj-02" data-accent="blue">
-          <span class="traj-eyebrow">Finalizado · Projeto acadêmico</span>
+      <article class="traj-case proj-feature reveal" id="proj-02" data-accent="blue">
+        <div class="traj-media" data-project="proj-02" role="button" tabindex="0" aria-label="Ver case completo de ConectaRH">
+          <div class="device-bar"><span></span><span></span><span></span></div>
+          <div class="device-viewport" style="aspect-ratio:1400/674"><img src="assets/projetos/conectarh-inicio.png" alt="Tela inicial do ConectaRH, plataforma de gestão de pessoas"></div>
+          <span class="media-zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M9 11h4M11 9v4"/></svg></span>
+        </div>
+        <div class="traj-text">
+          <span class="traj-eyebrow">Finalizado · Projeto acadêmico (Impacta)</span>
           <h3>ConectaRH</h3>
-          <div class="traj-body">
-            <div class="traj-media" data-project="proj-02" role="button" tabindex="0" aria-label="Ver case completo de ConectaRH">
-              <div class="device-bar"><span></span><span></span><span></span></div>
-              <div class="device-viewport"><img src="assets/projetos/conectarh-inicio.png" alt="Tela inicial do ConectaRH, plataforma de gestão de pessoas"></div>
-              <span class="media-zoom-hint">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M9 11h4M11 9v4"/></svg>
-              </span>
-            </div>
-            <div class="traj-text">
-              <ul class="traj-bullets">
-                <li>Centraliza ponto, férias, documentos e desligamento num só lugar, com quatro perfis de acesso.</li>
-                <li>Motor de regras trabalhistas aplica a matriz certa por tipo de contrato (CLT, estágio, PJ...).</li>
-                <li>Toda decisão relevante fica auditada: quem fez, o quê, quando e por quê.</li>
-              </ul>
-              <ul class="projeto-tags"><li>Streamlit</li><li>Xano</li><li>Supabase</li></ul>
-              <div class="traj-actions">
-                <a href="https://github.com/leonardo-sferreira/conectahr" target="_blank" rel="noopener" class="projeto-link">Ver repositório →</a>
-                <a href="https://leonardo-sferreira.github.io/conectahr/" target="_blank" rel="noopener" class="projeto-link">Ver documentação →</a>
-                <button type="button" class="btn-case" data-project="proj-02">Ver case completo</button>
-              </div>
-            </div>
+          <p class="proj-role"><span>Meu papel</span>Product Owner: planejei as sprints e participei de toda a produção, no front-end e no back-end.</p>
+          <ul class="traj-bullets">
+            <li>Centraliza ponto, férias, documentos e desligamento num só lugar, com quatro perfis de acesso.</li>
+            <li>Motor de regras trabalhistas aplica a matriz certa por tipo de contrato (CLT, estágio, PJ...).</li>
+            <li>Toda decisão relevante fica auditada: quem fez, o quê, quando e por quê.</li>
+          </ul>
+          <ul class="proj-numeros">
+            <li><strong>55</strong> telas</li>
+            <li><strong>316</strong> endpoints</li>
+            <li><strong>52</strong> verificações no CI</li>
+          </ul>
+          <ul class="projeto-tags"><li>Streamlit</li><li>Xano</li><li>Supabase</li></ul>
+          <div class="traj-actions">
+            <button type="button" class="btn-case" data-project="proj-02">Ver case completo</button>
+            <a href="https://github.com/leonardo-sferreira/conectahr" target="_blank" rel="noopener" class="projeto-link">Repositório →</a>
+            <a href="https://leonardo-sferreira.github.io/conectahr/" target="_blank" rel="noopener" class="projeto-link">Documentação →</a>
           </div>
-        </article>
+        </div>
+      </article>
 
-        <article class="traj-case reveal" id="proj-03" data-accent="cyan">
+    </div>
+
+    <div class="proj-outros">
+
+      <article class="traj-case proj-mini reveal" id="proj-03" data-accent="cyan">
+        <div class="traj-media traj-media--telas" data-project="proj-03" role="button" tabindex="0" aria-label="Ver case completo de Sabor Local">
+          <div class="device-viewport">
+            <img src="assets/projetos/sabor-local-home.png" alt="Tela inicial do app Sabor Local, com restaurantes e categorias">
+            <img src="assets/projetos/sabor-local-carrinho.png" alt="Carrinho do app Sabor Local">
+            <img src="assets/projetos/sabor-local-pagamento.png" alt="Tela de pagamento do app Sabor Local">
+          </div>
+          <span class="media-zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M9 11h4M11 9v4"/></svg></span>
+        </div>
+        <div class="traj-text">
           <span class="traj-eyebrow">Protótipo · Projeto acadêmico</span>
           <h3>Sabor Local</h3>
-          <div class="traj-body">
-            <div class="traj-media" data-project="proj-03" role="button" tabindex="0" aria-label="Ver case completo de Sabor Local">
-              <div class="device-bar"><span></span><span></span><span></span></div>
-              <div class="device-viewport"><img src="assets/projetos/sabor-local-home.png" alt="Tela inicial do app de delivery Sabor Local, com cardápio e categorias"></div>
-              <span class="media-zoom-hint">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M9 11h4M11 9v4"/></svg>
-              </span>
-            </div>
-            <div class="traj-text">
-              <ul class="traj-bullets">
-                <li>Login, cardápio por categoria, carrinho e pagamento pensados pra experiência tipo iFood.</li>
-                <li>Acompanhamento do pedido com mapa em tempo real.</li>
-                <li>Protótipo navegável completo no Figma, telas organizadas por fluxo.</li>
-              </ul>
-              <ul class="projeto-tags"><li>Figma</li><li>FlutterFlow</li><li>UX/UI</li></ul>
-              <div class="traj-actions">
-                <a href="https://www.figma.com/design/iRn8igu0iCwyqYTathrz9P/Sabor-local?node-id=0-1" target="_blank" rel="noopener" class="projeto-link">Ver protótipo →</a>
-                <button type="button" class="btn-case" data-project="proj-03">Ver case completo</button>
-              </div>
-            </div>
+          <p class="proj-role"><span>Meu papel</span>Design e prototipação no Figma, ajudando também nas outras frentes.</p>
+          <p class="proj-resumo">App de delivery de restaurantes locais: cardápio por categoria, carrinho, pagamento e acompanhamento do pedido no mapa, em protótipo navegável.</p>
+          <ul class="projeto-tags"><li>Figma</li><li>FlutterFlow</li><li>UX/UI</li></ul>
+          <div class="traj-actions">
+            <button type="button" class="btn-case" data-project="proj-03">Ver case completo</button>
+            <a href="https://www.figma.com/design/iRn8igu0iCwyqYTathrz9P/Sabor-local?node-id=0-1" target="_blank" rel="noopener" class="projeto-link">Protótipo →</a>
           </div>
-        </article>
+        </div>
+      </article>
 
-        <article class="traj-case reveal" id="proj-04" data-accent="gold">
+      <article class="traj-case proj-mini reveal" id="proj-04" data-accent="gold">
+        <div class="traj-media traj-media--diagram" data-project="proj-04" role="button" tabindex="0" aria-label="Ver case completo de Bot de Finanças">
+          <div class="device-viewport">
+            <svg class="diagram-icon is-accent" viewBox="0 0 48 48" fill="none">
+              <circle cx="24" cy="24" r="20" stroke="currentColor" stroke-width="2.5"/>
+              <path d="M33 15L13.5 23.3c-1 .4-1 1 0 1.4l5.3 1.8 2 6c.3.9 1 1 1.4.2l2.6-4.6M33 15L19.8 26.5M33 15l-4 15.5c-.2.9-.9 1-1.4.3l-4-5.3"
+                    stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>
+            </svg>
+            <svg class="diagram-arrow" viewBox="0 0 48 14" fill="none">
+              <path d="M0 7h42M34 1l7 6-7 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <svg class="diagram-icon" viewBox="0 0 48 48" fill="none">
+              <rect x="8" y="6" width="32" height="36" rx="4" stroke="currentColor" stroke-width="2.5"/>
+              <path d="M8 18h32M20 18v24" stroke="currentColor" stroke-width="2.5"/>
+              <circle cx="14" cy="12" r="1.6" fill="currentColor"/>
+            </svg>
+          </div>
+          <span class="media-zoom-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M9 11h4M11 9v4"/></svg></span>
+        </div>
+        <div class="traj-text">
           <span class="traj-eyebrow">Em uso pessoal · Repositório privado</span>
           <h3>Bot de Finanças</h3>
-          <div class="traj-body">
-            <div class="traj-media traj-media--diagram" data-project="proj-04" role="button" tabindex="0" aria-label="Ver case completo de Bot de Finanças">
-              <div class="device-bar"><span></span><span></span><span></span></div>
-              <span class="media-zoom-hint">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M9 11h4M11 9v4"/></svg>
-              </span>
-              <div class="device-viewport">
-                <svg class="diagram-icon is-accent" viewBox="0 0 48 48" fill="none">
-                  <circle cx="24" cy="24" r="20" stroke="currentColor" stroke-width="2.5"/>
-                  <path d="M33 15L13.5 23.3c-1 .4-1 1 0 1.4l5.3 1.8 2 6c.3.9 1 1 1.4.2l2.6-4.6M33 15L19.8 26.5M33 15l-4 15.5c-.2.9-.9 1-1.4.3l-4-5.3"
-                        stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>
-                </svg>
-                <svg class="diagram-arrow" viewBox="0 0 48 14" fill="none">
-                  <path d="M0 7h42M34 1l7 6-7 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-                <svg class="diagram-icon" viewBox="0 0 48 48" fill="none">
-                  <rect x="8" y="6" width="32" height="36" rx="4" stroke="currentColor" stroke-width="2.5"/>
-                  <path d="M8 18h32M20 18v24" stroke="currentColor" stroke-width="2.5"/>
-                  <circle cx="14" cy="12" r="1.6" fill="currentColor"/>
-                </svg>
-              </div>
-            </div>
-            <div class="traj-text">
-              <ul class="traj-bullets">
-                <li>Registra gasto, recebimento, fatura, investimento e empréstimo direto pelo Telegram.</li>
-                <li>Lança recorrentes sozinho e avisa fatura e parcela que vence em 3 dias.</li>
-                <li>Fecha o mês automaticamente: entradas, saídas, resultado e orçamento estourado.</li>
-              </ul>
-              <ul class="projeto-tags"><li>Python</li><li>Telegram Bot API</li><li>Notion API</li></ul>
-              <div class="traj-actions">
-                <span class="projeto-link projeto-link--static">Código fonte privado</span>
-                <button type="button" class="btn-case" data-project="proj-04">Ver case completo</button>
-              </div>
-            </div>
+          <p class="proj-role"><span>Meu papel</span>Projeto individual, do planejamento ao código.</p>
+          <p class="proj-resumo">Registra gastos e recebimentos por mensagem no Telegram, lança recorrentes, avisa contas que vencem e fecha o mês sozinho no Notion.</p>
+          <ul class="projeto-tags"><li>Python</li><li>Telegram Bot API</li><li>Notion API</li></ul>
+          <div class="traj-actions">
+            <button type="button" class="btn-case" data-project="proj-04">Ver case completo</button>
+            <span class="projeto-link projeto-link--static">Código privado</span>
           </div>
-        </article>
+        </div>
+      </article>
 
-      </div>
     </div>
   </section>
 
@@ -372,11 +340,14 @@
         <span class="modal-category" id="modalCategory"></span>
         <h3 id="modalTitle"></h3>
         <div class="modal-role">
-          <strong>Função &amp; desafio</strong>
+          <strong>Meu papel</strong>
           <p id="modalRole"></p>
         </div>
-        <div class="modal-desc" id="modalDesc"></div>
-        <div class="modal-extra" id="modalDecisions"><strong>Decisões que tomei</strong><ul></ul></div>
+        <p class="modal-sector"><span>Setor</span><b id="modalSector"></b></p>
+        <div class="modal-extra modal-need"><strong>A necessidade</strong><p id="modalNeed"></p></div>
+        <div class="modal-extra" id="modalChallenges"><strong>Desafios e como lidei</strong><ul></ul></div>
+        <div class="modal-extra" id="modalSteps"><strong>Como fiz</strong><ol></ol><p class="modal-tools"></p></div>
+        <div class="modal-extra modal-results" id="modalResults"><strong>Resultados</strong><ul></ul></div>
         <div class="modal-extra" id="modalLessons"><strong>O que aprendi</strong><ul></ul></div>
         <ul class="projeto-tags" id="modalTags"></ul>
         <a href="#" class="projeto-link" id="modalLink" target="_blank" rel="noopener">Ver repositório →</a>

@@ -257,7 +257,7 @@ if (window.matchMedia("(pointer: fine)").matches) {
       const x = (e.clientX - rect.left) / rect.width - 0.5;
       const y = (e.clientY - rect.top) / rect.height - 0.5;
       media.style.transition = "transform 0.1s ease-out";
-      media.style.transform = `perspective(800px) rotateX(${(-y * 10).toFixed(2)}deg) rotateY(${(x * 10).toFixed(2)}deg)`;
+      media.style.transform = `perspective(800px) rotateX(${(-y * 4).toFixed(2)}deg) rotateY(${(x * 4).toFixed(2)}deg)`;
     });
     media.addEventListener("mouseleave", () => {
       media.style.transition = "transform 0.5s ease";
@@ -411,52 +411,37 @@ if (heroCanvas && !window.matchMedia("(prefers-reduced-motion: reduce)").matches
   requestAnimationFrame(step);
 }
 
-/* ---------- TRAJETÓRIA: SCROLL-SPY ---------- */
-const trajCases = document.querySelectorAll(".traj-case");
-const trajPathItems = document.querySelectorAll(".path-item");
-
-if (trajCases.length && trajPathItems.length) {
-  const trajObserver = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          const id = entry.target.id;
-          trajPathItems.forEach((item) => {
-            item.classList.toggle("active", item.dataset.target === id);
-          });
-        }
-      });
-    },
-    { rootMargin: "-40% 0px -50% 0px", threshold: 0 }
-  );
-  trajCases.forEach((el) => trajObserver.observe(el));
-}
-
 /* ---------- MODAL: CASE COMPLETO ---------- */
 const PROJECTS = {
   "proj-01": {
     category: "Engenharia de Software · Saúde",
     title: "Fila Prioritária — Pronto-Socorro",
-    role: "Como Product Owner do time, defini as regras de priorização clínica, desenhei o protótipo das telas e modelei o banco de dados — depois acompanhei a equipe de back-end e front-end na implementação.",
-    desc: [
-      "O desafio era substituir a fila por ordem de chegada de um pronto-socorro por uma fila que prioriza de verdade quem está pior — sem perder transparência para quem está esperando.",
-      "O sistema cuida da triagem (sintomas e sinais vitais viram uma classificação de risco), direciona cada ficha para a especialidade certa e mostra as chamadas num painel público que nunca expõe nome ou CPF.",
-      "Projeto finalizado: todas as funcionalidades planejadas foram entregues, testadas no sistema integrado e validadas por mim como PO. O sistema ganhou o nome de Prioriza e tem manual do usuário e documentação técnica publicados.",
+    role: "Fui o Product Owner do time: planejei as sprints, defini as regras de priorização clínica e participei de toda a produção, no front-end e no back-end.",
+    sector: "Saúde · atendimento de pronto-socorro (projeto acadêmico da Impacta)",
+    need: "Em muitos pronto-socorros a fila segue a ordem de chegada, e quem está mais grave pode esperar atrás de casos leves. O projeto precisava de uma fila que priorizasse pelo risco clínico, sem perder a transparência para quem está esperando.",
+    challenges: [
+      "<strong>Prioridade com critério clínico, não por chegada.</strong> Defini a regra de risco (sintomas e sinais vitais viram Vermelha, Amarela ou Azul) e guardei os limites no banco, para ajustar a regra sem um novo deploy.",
+      "<strong>Privacidade no painel público.</strong> O painel é montado campo a campo e um teste barra qualquer dado pessoal: nome e CPF nunca saem do servidor.",
+      "<strong>Dois médicos chamando ao mesmo tempo.</strong> O próximo paciente é escolhido no servidor, numa operação atômica, e duas pessoas nunca pegam a mesma ficha.",
+      "<strong>Sem tempo real no plano do Xano.</strong> Os painéis atualizam a cada 5 segundos, e essa troca ficou registrada como decisão na documentação.",
     ],
-    decisionsTitle: "Decisões que tomei como PO",
-    decisions: [
-      "Chamada sempre manual: uma pessoa é responsável por cada chamada, sem repetição nem encerramento automáticos.",
-      "Painel público montado campo a campo, com um teste que barra qualquer dado pessoal. Nome e CPF nunca saem do servidor.",
-      "Limites de risco guardados no banco, para ajustar a regra clínica sem precisar de um novo deploy.",
-      "Próximo paciente escolhido no servidor, numa operação atômica: dois médicos nunca pegam a mesma ficha.",
-      "Especificação antes do código no OpenSpec, com IA ajudando na implementação e testes no CI antes de cada merge.",
+    steps: [
+      "Levantei as regras de triagem e priorização e escrevi a especificação no OpenSpec (127 requisitos) antes de qualquer código.",
+      "Planejei as sprints e dividi as entregas com o time.",
+      "Construímos o back-end no Xano (23 tabelas e 71 endpoints) e o front-end em Reflex (33 telas), com IA ajudando na implementação.",
+      "Cada requisito ganhou testes com identificador próprio, rodando no CI antes de cada merge.",
+      "Validei cada entrega como PO e publicamos o manual do usuário e a documentação técnica.",
+    ],
+    tools: "OpenSpec, Xano, Reflex (Python), GitHub Actions",
+    results: [
+      "Todas as funcionalidades planejadas entregues e validadas no sistema integrado.",
+      "486 testes catalogados, cada um ligado aos requisitos que comprova.",
+      "Sistema batizado de Prioriza, com manual do usuário e documentação técnica publicados.",
     ],
     lessons: [
       "Regra clínica precisa estar escrita antes do código. A especificação virou o critério de aceite que eu usava para validar cada entrega.",
-      "Toda escolha técnica tem custo: sem tempo real no plano do Xano, os painéis atualizam a cada 5 segundos, e isso ficou registrado como decisão.",
       "Dar um identificador fixo para cada teste deixou a validação rastreável: cada requisito aponta para os testes que o comprovam.",
     ],
-    tech: "Por trás da tela: front-end em Reflex com 33 telas, back-end em Xano com 23 tabelas e 71 endpoints, 127 requisitos especificados no OpenSpec e 486 testes catalogados.",
     images: [
       { src: "assets/projetos/ps-fila-totem.png", alt: "Totem de autoatendimento do pronto-socorro" },
       { src: "assets/projetos/ps-fila-painel.png", alt: "Painel público de chamadas" },
@@ -468,24 +453,32 @@ const PROJECTS = {
   "proj-02": {
     category: "Engenharia de Software · RH",
     title: "ConectaRH",
-    role: "Participei do desenho das regras de negócio e do modelo de dados, além de construir boa parte das telas em Streamlit e a integração com o backend em Xano.",
-    desc: [
-      "O ConectaRH nasceu pra tirar RH, gestores e colaboradores das planilhas e do e-mail — um lugar só para ponto, férias, documentos e desligamento, onde cada perfil vê só o que pode ver.",
-      "Toda decisão importante (aprovar férias, corrigir ponto, mudar um dado cadastral) fica registrada: quem fez, quando e por quê.",
-      "Projeto finalizado e publicado: as 40 entregas planejadas foram concluídas, testadas e arquivadas, com manual do usuário e documentação técnica.",
+    role: "Fui o Product Owner do time: planejei as sprints e participei de toda a produção, das telas em Streamlit ao back-end em Xano.",
+    sector: "Recursos Humanos · gestão de pessoas (projeto acadêmico da Impacta)",
+    need: "RH, gestores e colaboradores resolviam ponto, férias, documentos e desligamento em planilhas e e-mails. O sistema precisava reunir tudo num lugar só, onde cada perfil vê apenas o que pode ver e toda decisão importante fica registrada.",
+    challenges: [
+      "<strong>Dados sensíveis e LGPD.</strong> Quem vê cada campo é decidido no banco e na API: o atestado, que é dado de saúde, nunca chega ao gestor, e a auditoria guarda os dados pessoais mascarados.",
+      "<strong>Quatro perfis de acesso em 316 endpoints.</strong> A autorização é conferida em cada endpoint, e uma checagem no CI barra qualquer endpoint que esqueça essa guarda.",
+      "<strong>Registros que a lei não deixa alterar.</strong> Ponto e banco de horas só aceitam inclusão: uma correção vira um novo registro, nunca uma edição.",
+      "<strong>Regras diferentes por tipo de contrato.</strong> Um motor de regras aplica a matriz certa para CLT, estágio, PJ e outros vínculos.",
     ],
-    decisionsTitle: "Decisões do projeto",
-    decisions: [
-      "O backend decide tudo: o menu por perfil é só conveniência, e a autorização é conferida em cada endpoint e no CI.",
-      "Arquivos vão direto para um bucket privado do Supabase por um endereço de uso único. A chave nunca sai do backend.",
-      "Onde a lei pede, só inclusão: ponto e banco de horas nunca são editados, e uma correção vira um novo registro.",
-      "O atestado, que é dado de saúde, nunca chega ao gestor, e a auditoria guarda os dados pessoais mascarados.",
+    steps: [
+      "Mapeei os processos de RH que o sistema cobriria e os quatro perfis de acesso.",
+      "Planejei as sprints e dividi o trabalho em 40 entregas, cada uma especificada antes do código.",
+      "Modelamos o banco (80 tabelas) e construímos o back-end no Xano, com 316 endpoints.",
+      "Fizemos as 55 telas em Streamlit, com os arquivos guardados num bucket privado do Supabase.",
+      "Automatizamos 52 verificações no CI a cada Pull Request e publicamos o manual e a documentação técnica.",
+    ],
+    tools: "Xano, Streamlit (Python), Supabase, GitHub Actions",
+    results: [
+      "As 40 entregas planejadas concluídas, testadas e arquivadas.",
+      "Sistema publicado, com manual do usuário e documentação técnica.",
+      "52 verificações automáticas protegendo cada mudança no código.",
     ],
     lessons: [
       "LGPD muda o modelo de dados, não só o texto do aviso: quem vê cada campo é decidido no banco e na API.",
       "Uma checagem automática no CI pega o endpoint sem guarda de acesso que uma revisão manual deixaria passar.",
     ],
-    tech: "Por trás da tela: 55 telas em Streamlit, backend no Xano com 80 tabelas e 316 endpoints, arquivos no Supabase e 52 verificações automatizadas no CI a cada Pull Request.",
     images: [
       { src: "assets/projetos/conectarh-inicio.png", alt: "Tela inicial do ConectaRH" },
       { src: "assets/projetos/conectarh-perfil.png", alt: "Tela de perfil do colaborador" },
@@ -497,17 +490,25 @@ const PROJECTS = {
   "proj-03": {
     category: "UX/UI · Prototipação",
     title: "Sabor Local",
-    role: "Fiz o design de ponta a ponta no Figma — fluxos, telas e protótipo navegável — pensando numa experiência de delivery tão fluida quanto a de apps grandes como o iFood.",
-    desc: [
-      "O Sabor Local é um protótipo de app de delivery de comida mineira, pensado pra ter a mesma fluidez de apps grandes como o iFood — do cardápio ao acompanhamento do pedido no mapa.",
-      "Desenhei o fluxo inteiro: login, cardápio por categoria com sugestão do chef, carrinho, pagamento, endereço e avaliação da entrega.",
+    role: "Fiquei à frente do design no Figma — fluxos, telas e protótipo navegável — e ajudei também nas outras frentes do projeto.",
+    sector: "Alimentação · delivery de restaurantes locais (projeto acadêmico)",
+    need: "Restaurantes locais de comida mineira precisavam de um canal de delivery próprio, com a mesma fluidez dos apps grandes, como o iFood: do cardápio ao acompanhamento do pedido no mapa.",
+    challenges: [
+      "<strong>Competir em experiência com apps grandes.</strong> Usei padrões que o usuário já conhece (cardápio por categoria, carrinho e pedido no mapa) para o fluxo ser familiar desde o primeiro uso.",
+      "<strong>Os dois lados da operação.</strong> Desenhei também o painel do restaurante, que recebe e despacha o pedido, e não só o app do cliente.",
+      "<strong>Um arquivo que o time conseguisse usar.</strong> Organizei o Figma por fluxo numerado, com uma seção de estilos e componentes reaproveitados.",
     ],
-    decisionsTitle: "Decisões que tomei",
-    decisions: [
-      "Desenhar os dois lados da operação: o app do cliente e o painel do restaurante que recebe e despacha o pedido.",
-      "Organizar o arquivo do Figma por fluxo numerado, com uma seção de estilo e componentes reaproveitados.",
+    steps: [
+      "Mapeei a jornada do cliente: acesso, cardápio, pagamento, endereço, pedido e perfil.",
+      "Defini os estilos e os componentes reaproveitáveis no Figma.",
+      "Desenhei as telas do cliente e do restaurante e liguei tudo num protótipo navegável.",
+      "Apoiei o time nas outras frentes do projeto.",
     ],
-    tech: "Por trás da tela: protótipo navegável completo no Figma, organizado por fluxo (acesso, cardápio, pagamento, endereço, pedido e perfil), pronto para virar implementação real.",
+    tools: "Figma, FlutterFlow",
+    results: [
+      "Protótipo navegável completo, com 26 telas: 17 do app do cliente e 9 do painel do restaurante.",
+      "Arquivo organizado por fluxo, pronto para virar implementação.",
+    ],
     images: [
       { src: "assets/projetos/sabor-local-home.png", alt: "Tela inicial do app com cardápio" },
       { src: "assets/projetos/sabor-local-carrinho.png", alt: "Tela de carrinho de compras" },
@@ -520,16 +521,25 @@ const PROJECTS = {
     category: "Automação · Uso pessoal",
     title: "Bot de Finanças",
     role: "Projetei e implementei sozinho, do fluxo de conversa no Telegram até a integração com a API do Notion.",
-    desc: [
-      "Criei esse bot pra resolver um problema bem pessoal: parar de esquecer de anotar gasto. Ele entende uma mensagem curta, tipo '45,90 almoço', e já guarda tudo organizado.",
-      "Também avisa sozinho quando uma fatura ou parcela tá perto de vencer, pergunta no fim do dia se eu lancei meus gastos, manda um resumo da semana e fecha o mês sozinho.",
+    sector: "Finanças pessoais · automação (projeto pessoal)",
+    need: "Eu esquecia de anotar os gastos e perdia o controle das contas que venciam. Precisava registrar tudo em segundos, sem abrir planilha.",
+    challenges: [
+      "<strong>Registrar tinha que ser mais rápido que esquecer.</strong> A entrada é uma mensagem curta no Telegram, como \"45,90 almoço\", em vez de um formulário.",
+      "<strong>Contas e parcelas passando do prazo.</strong> Rotinas agendadas avisam o que vence nos próximos 3 dias.",
+      "<strong>Manter o hábito.</strong> O bot pergunta no fim do dia se lancei os gastos e manda um resumo da semana.",
     ],
-    decisionsTitle: "Decisões que tomei",
-    decisions: [
-      "Entrada por uma mensagem curta, como \"45,90 almoço\", em vez de formulário: o problema era esquecer de anotar.",
-      "Rotinas agendadas para o que eu esquecia: lembrete no fim do dia, aviso de vencimento e fechamento do mês.",
+    steps: [
+      "Defini o que precisava registrar: gasto, recebimento, fatura, investimento e empréstimo.",
+      "Organizei as bases no Notion para guardar cada tipo de lançamento.",
+      "Escrevi o bot em Python, ligado à API do Telegram e à API do Notion.",
+      "Adicionei as rotinas agendadas: lembrete diário, aviso de vencimento, resumo semanal e fechamento do mês.",
     ],
-    tech: "Por trás da tela: bot em Python integrado à API do Telegram e à API do Notion. Repositório privado, sem prints públicos por enquanto.",
+    tools: "Python, Telegram Bot API, Notion API",
+    results: [
+      "Em uso no dia a dia: registrar um gasto leva uma mensagem.",
+      "Lançamentos recorrentes entram sozinhos.",
+      "O fechamento do mês sai automático: entradas, saídas, resultado e orçamento estourado.",
+    ],
     images: [],
     tags: ["Python", "Telegram Bot API", "Notion API"],
     link: null,
@@ -543,10 +553,13 @@ const galDots = document.getElementById("galDots");
 const modalCategory = document.getElementById("modalCategory");
 const modalTitle = document.getElementById("modalTitle");
 const modalRole = document.getElementById("modalRole");
-const modalDesc = document.getElementById("modalDesc");
+const modalSector = document.getElementById("modalSector");
+const modalNeed = document.getElementById("modalNeed");
+const modalChallenges = document.getElementById("modalChallenges");
+const modalSteps = document.getElementById("modalSteps");
+const modalResults = document.getElementById("modalResults");
 const modalTags = document.getElementById("modalTags");
 const modalLink = document.getElementById("modalLink");
-const modalDecisions = document.getElementById("modalDecisions");
 const modalLessons = document.getElementById("modalLessons");
 
 function renderList(box, title, items) {
@@ -557,7 +570,7 @@ function renderList(box, title, items) {
   }
   box.style.display = "";
   box.querySelector("strong").textContent = title;
-  box.querySelector("ul").innerHTML = items.map((i) => `<li>${i}</li>`).join("");
+  box.querySelector("ul, ol").innerHTML = items.map((i) => `<li>${i}</li>`).join("");
 }
 
 if (modalOverlay) {
@@ -641,9 +654,12 @@ if (modalOverlay) {
     modalCategory.textContent = p.category;
     modalTitle.textContent = p.title;
     modalRole.textContent = p.role;
-    modalDesc.innerHTML = p.desc.map((para) => `<p>${para}</p>`).join("") +
-      (p.tech ? `<p class="tech-note">${p.tech}</p>` : "");
-    renderList(modalDecisions, p.decisionsTitle || "Decisões que tomei", p.decisions);
+    modalSector.textContent = p.sector;
+    modalNeed.textContent = p.need;
+    renderList(modalChallenges, "Desafios e como lidei", p.challenges);
+    renderList(modalSteps, "Como fiz", p.steps);
+    modalSteps.querySelector(".modal-tools").innerHTML = `<span>Ferramentas</span>${p.tools}`;
+    renderList(modalResults, "Resultados", p.results);
     renderList(modalLessons, "O que aprendi", p.lessons);
     modalTags.innerHTML = p.tags.map((t) => `<li>${t}</li>`).join("");
     if (p.link) {
